@@ -8,6 +8,6 @@
     </qresource>
     
      <qresource prefix="/sql">
-        
+        <file alias="schema.sql">resources/sql/schema.sql</file>
     </qresource>
 </RCC>
