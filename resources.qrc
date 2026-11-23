@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/styles">
+        
+    </qresource>
+
+    <qresource prefix="/icons">
+        
+    </qresource>
+    
+     <qresource prefix="/sql">
+        
+    </qresource>
+</RCC>
