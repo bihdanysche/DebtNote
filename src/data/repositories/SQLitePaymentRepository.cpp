@@ -1,0 +1,159 @@
+#include "SQLitePaymentRepository.h"
+
+#include <QSqlError>
+#include <QVariant>
+
+SQLitePaymentRepository::SQLitePaymentRepository(QSqlDatabase db)
+    : m_db(db)
+{}
+
+std::optional<qint64> SQLitePaymentRepository::add(const Payment& payment, QString* error) {
+    QSqlQuery query(m_db);
+
+    query.prepare(R"(
+        INSERT INTO payments (contact_id, amount, direction, date_time, comment)
+        VALUES (:contact_id, :amount, :direction, :date_time, :comment)
+    )");
+
+    query.bindValue(":contact_id", payment.contactId());
+    query.bindValue(":amount", payment.amount().kopecks());
+    query.bindValue(":direction", static_cast<int>(payment.direction()));
+    query.bindValue(":date_time", payment.dateTime().toString(Qt::ISODate));
+    query.bindValue(":comment", payment.comment());
+
+    if (!query.exec()) {
+        if (error) *error = query.lastError().text();
+        return std::nullopt;
+    }
+
+    return query.lastInsertId().toLongLong();
+};
+
+bool SQLitePaymentRepository::update(const Payment& payment, QString* error) {
+    QSqlQuery query(m_db);
+
+    query.prepare(R"(
+        UPDATE payments
+        SET contact_id = :contact_id,
+            amount = :amount,
+            direction = :direction,
+            date_time = :date_time,
+            comment = :comment
+        WHERE id = :id
+    )");
+
+    query.bindValue(":contact_id", payment.contactId());
+    query.bindValue(":amount", payment.amount().kopecks());
+    query.bindValue(":direction", static_cast<int>(payment.direction()));
+    query.bindValue(":date_time", payment.dateTime().toString(Qt::ISODate));
+    query.bindValue(":comment", payment.comment());
+    query.bindValue(":id", payment.id());
+
+    if (!query.exec()) {
+        if (error) *error = query.lastError().text();
+        return false;
+    }
+
+    return true;
+};
+
+bool SQLitePaymentRepository::remove(qint64 id, QString* error) {
+    QSqlQuery query(m_db);
+
+    query.prepare(R"(
+        DELETE FROM payments
+        WHERE id = :id
+    )");
+
+    query.bindValue(":id", id);
+
+    if (!query.exec()) {
+        if (error) *error = query.lastError().text();
+        return false;
+    }
+
+    return true;
+};
+
+std::optional<Payment> SQLitePaymentRepository::getById(qint64 id, QString* error) {
+    QSqlQuery query(m_db);
+
+    query.prepare(R"(
+        SELECT id, contact_id, amount, direction, date_time, comment
+        FROM payments
+        WHERE id = :id
+    )");
+
+    query.bindValue(":id", id);
+
+    if (!query.exec()) {
+        if (error) *error = query.lastError().text();
+        return std::nullopt;
+    }
+
+    if (!query.next()) {
+        return std::nullopt;
+    }
+
+    return fromQuery(query);
+};
+
+QList<Payment> SQLitePaymentRepository::getByContact(qint64 contactId, QString* error) {
+    QSqlQuery query(m_db);
+
+    query.prepare(R"(
+        SELECT id, contact_id, amount, direction, date_time, comment
+        FROM payments
+        WHERE contact_id = :contact_id
+        ORDER BY date_time DESC, id DESC
+    )");
+
+    query.bindValue(":contact_id", contactId);
+
+    if (!query.exec()) {
+        if (error) *error = query.lastError().text();
+        return {};
+    }
+
+    QList<Payment> payments;
+    while (query.next()) {
+        payments.append(fromQuery(query));
+    }
+
+    return payments;
+};
+
+QList<Payment> SQLitePaymentRepository::getAll(QString* error) {
+    QSqlQuery query(m_db);
+
+    query.prepare(R"(
+        SELECT id, contact_id, amount, direction, date_time, comment
+        FROM payments
+        ORDER BY date_time DESC, id DESC
+    )");
+
+    if (!query.exec()) {
+        if (error) *error = query.lastError().text();
+        return {};
+    }
+
+    QList<Payment> payments;
+    while (query.next()) {
+        payments.append(fromQuery(query));
+    }
+
+    return payments;
+};
+
+Payment SQLitePaymentRepository::fromQuery(const QSqlQuery& query) {
+    Payment payment;
+
+    payment.setId(query.value("id").toLongLong());
+    payment.setContactId(query.value("contact_id").toLongLong());
+    payment.setAmount(Money(query.value("amount").toLongLong()));
+    payment.setDirection(static_cast<PaymentDirection>(query.value("direction").toInt()));
+    payment.setDateTime(QDateTime::fromString(query.value("date_time").toString(), Qt::ISODate));
+    payment.setComment(query.value("comment").toString());
+
+    return payment;
+};

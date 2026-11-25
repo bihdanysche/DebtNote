@@ -93,7 +93,10 @@ std::optional<Contact> SQLiteContactRepository::getById(qint64 id, QString* erro
         return result;
     }
 
-    query.next();
+    if (!query.next()) {
+        return std::nullopt;
+    }
+    
     result = fromQuery(query);
 
     return result;

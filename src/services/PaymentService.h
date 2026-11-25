@@ -1,0 +1,32 @@
+#pragma once
+
+#include <QList>
+#include <QObject>
+#include <optional>
+
+#include "domain/entities/Payment.h"
+#include "domain/repositories/IPaymentRepository.h"
+
+class PaymentService : public QObject {
+    Q_OBJECT
+
+public:
+    explicit PaymentService(IPaymentRepository& repo, QObject* parent = nullptr);
+
+    bool add(const Payment& payment, QString* error = nullptr);
+    bool update(const Payment& payment, QString* error = nullptr);
+    bool remove(qint64 id, QString* error = nullptr);
+
+    std::optional<Payment> getById(qint64 id, QString* error = nullptr);
+    QList<Payment> getByContact(qint64 contactId, QString* error = nullptr);
+    QList<Payment> getAll(QString* error = nullptr);
+
+signals:
+    void paymentAdded(const Payment& payment);
+    void paymentUpdated(const Payment& payment);
+    void paymentRemoved(qint64 paymentId, qint64 contactId);
+    void paymentsChanged();
+
+private:
+    IPaymentRepository& m_repo;
+};
