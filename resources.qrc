@@ -1,13 +1,28 @@
 <RCC>
     <qresource prefix="/styles">
-        
+        <file alias="main.qss">resources/styles/main.qss</file>
     </qresource>
 
     <qresource prefix="/icons">
-        
+        <file alias="house.svg">resources/icons/house.svg</file>
+        <file alias="users-round.svg">resources/icons/users-round.svg</file>
+        <file alias="app.png">resources/icons/app.png</file>
+        <file alias="view.svg">resources/icons/view.svg</file>
+        <file alias="edit.svg">resources/icons/edit.svg</file>
+        <file alias="delete.svg">resources/icons/delete.svg</file>
+        <file alias="plus.svg">resources/icons/plus.svg</file>
+        <file alias="menu.svg">resources/icons/menu.svg</file>
+        <file alias="back.svg">resources/icons/back.svg</file>
     </qresource>
     
-     <qresource prefix="/sql">
+    <qresource prefix="/sql">
         <file alias="schema.sql">resources/sql/schema.sql</file>
+    </qresource>
+
+    <qresource prefix="/fonts">
+        <file alias="NotoSans-Regular.ttf">resources/fonts/NotoSans-Regular.ttf</file>
+        <file alias="NotoSans-Italic.ttf">resources/fonts/NotoSans-Italic.ttf</file>
+        <file alias="NotoSans-Bold.ttf">resources/fonts/NotoSans-Bold.ttf</file>
+        <file alias="NotoSans-Medium.ttf">resources/fonts/NotoSans-Medium.ttf</file>
     </qresource>
 </RCC>

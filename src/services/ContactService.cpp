@@ -36,6 +36,19 @@ bool ContactService::add(Contact& contact, QString* error) {
     return true;
 }
 
+std::optional<Contact> ContactService::getById(qint64 id, QString* error) {
+    QString dbError;
+    std::optional<Contact> result = m_repo.getById(id, &dbError);
+
+    if (!dbError.isEmpty()) {
+        qWarning() << "ContactService::getById failed: " << dbError;
+        if (error) *error = kDatabaseError;
+        return {};
+    }
+
+    return result;
+}
+
 QList<Contact> ContactService::getAll(QString* error) {
     QString dbError;
     QList<Contact> result = m_repo.getAll(&dbError);
@@ -47,4 +60,37 @@ QList<Contact> ContactService::getAll(QString* error) {
     }
 
     return result;
+}
+
+bool ContactService::update(const Contact& contact, QString* error) {
+    QStringList problems = contact.validate();
+
+    if (!problems.isEmpty()) {
+        if (error) *error = problems[0];
+        return false;
+    }
+
+    QString dbError;
+
+    if (!m_repo.update(contact, &dbError)) {
+        if (error) *error = kDatabaseError;
+        qWarning() << "ContactService::update failed: " << dbError;
+        return false;
+    }
+
+    emit contactsChanged();
+    return true;
+}
+
+bool ContactService::remove(qint64 id, QString* error) {
+    QString dbError;
+    
+    if (!m_repo.remove(id, &dbError)) {
+        if (error) *error = kDatabaseError;
+        qWarning() << "ContactService::remove failed: " << dbError;
+        return false;
+    }
+
+    emit contactsChanged();
+    return true;
 }

@@ -1,0 +1,267 @@
+/* CORE */
+QWidget {
+  color: #1c2b24;
+  font-family: "Noto Sans";
+  font-size: 14px;
+}
+
+/* CORE / Button variations */
+QPushButton {
+  background: #2e8b57;
+  color: #ffffff;
+  border: 1px solid #2e8b57;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-weight: 600;
+}
+QPushButton:hover {
+  background: #277a4c;
+  border-color: #277a4c;
+}
+QPushButton:pressed {
+  background: #206940;
+  border-color: #206940;
+}
+QPushButton:disabled {
+  background: #d5e4db;
+  border-color: #d5e4db;
+  color: #8fa89a;
+}
+
+QPushButton[variant="secondary"] {
+  background: #ffffff;
+  color: #1c2b24;
+  border: 1px solid #c3d3c9;
+}
+QPushButton[variant="secondary"]:hover {
+  background: #edf5f0;
+  border-color: #a8bdb0;
+}
+QPushButton[variant="secondary"]:pressed {
+  background: #e0ede5;
+}
+QPushButton[variant="secondary"]:disabled {
+  background: #ffffff;
+  border-color: #e1e9e4;
+  color: #a6b5ab;
+}
+
+QPushButton[variant="danger"] {
+  background: #d64545;
+  color: #ffffff;
+  border: 1px solid #d64545;
+}
+QPushButton[variant="danger"]:hover {
+  background: #c03a3a;
+  border-color: #c03a3a;
+}
+QPushButton[variant="danger"]:pressed {
+  background: #a93030;
+  border-color: #a93030;
+}
+QPushButton[variant="danger"]:disabled {
+  background: #f0cfcf;
+  border-color: #f0cfcf;
+  color: #ffffff;
+}
+
+/* SIDE MENU */
+#SideMenu {
+  background: #ffffff;
+  border-right: 1px solid #dde7e1;
+}
+
+QPushButton#SideNavButton {
+  background: transparent;
+  border: none;
+  border-radius: 12px;
+  padding: 0;
+}
+QPushButton#SideNavButton:hover {
+  background: #edf5f0;
+}
+QPushButton#SideNavButton[selected="true"] {
+  background: #e4f3ea;
+}
+
+QPushButton#SideNavButton QLabel {
+  background: transparent;
+  color: #65766c;
+  font-size: 12px;
+}
+QPushButton#SideNavButton[selected="true"] QLabel {
+  color: #206940;
+  font-weight: 600;
+}
+
+/* PAGES CORE */
+#PageTitle {
+  font-size: 24px;
+  font-weight: 600;
+}
+#Hint {
+  color: #65766c;
+}
+
+/* CONTACTS PAGE */
+QFrame#ContactItem {
+  background: #ffffff;
+  border: 1px solid #dde7e1;
+  border-radius: 12px;
+}
+QFrame#ContactItem[hovered="true"] {
+  background: #e1ffee;
+  border-color: #c9d8cf;
+}
+QFrame#ContactItem QLabel {
+  background: transparent;
+  font-size: 15px;
+}
+QFrame#ContactItem QLabel#ContactItemArrow {
+  color: #a6b5ab;
+  font-size: 18px;
+}
+
+/* CONFIRM DIALOG */
+#dialog {
+  background-color: transparent;
+}
+
+#d_inner {
+  background: white;
+  border-radius: 10px;
+}
+
+#d_title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+#d_desc {
+  font-size: 15px;
+}
+
+/* TOASTS */
+#toasts_cont {
+  background-color: rgba(0, 0, 0, 0);
+}
+
+QFrame[class="toast"] {
+  background-color: rgba(0, 0, 0, 150);
+  border-radius: 10px;
+}
+
+QLabel[class="toast_text"] {
+  color: rgba(255, 255, 255, 200);
+  font-size: 17px;
+}
+
+/* CONTEXT MENU */
+QMenu {
+  padding: 5px;
+  border: 1px solid #1c2b24;
+  border-radius: 8px;
+}
+
+QMenu::item {
+  padding: 5px 12px;
+  padding-left: 12px;
+  spacing: 8px;
+  border-radius: 8px;
+}
+
+QMenu::icon {
+  padding-left: 12px;
+}
+
+QMenu::item:selected {
+  background: #c0d0c7;
+}
+
+QMenu::item:pressed {
+  background: #aab7b0;
+}
+
+/* CONTACTS FORM */
+[modal="contactForm"] QLabel[role="field"] {
+  color: #65766c;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* MODAL SHARED */
+#ModalTitle {
+  font-size: 25px;
+  font-weight: 600;
+}
+QLineEdit,
+QTextEdit {
+  padding: 10px;
+  background: white;
+  border: 1px solid #c3d3c9;
+  border-radius: 8px;
+}
+QLineEdit:focus,
+QTextEdit:focus {
+  background: #fefffe;
+  border-color: #d5e4db;
+}
+
+/* CONTACT DETAILS PAGE */
+QWidget[page="contactDetails"] {
+  background: #f3f8f5;
+}
+
+QLabel#PageTitle {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1c2b24;
+}
+
+QPushButton#IconButton {
+  background: #ffffff;
+  border: 1px solid #c3d3c9;
+  border-radius: 10px;
+  padding: 0;
+}
+
+QPushButton#IconButton:hover {
+  background: #edf5f0;
+  border-color: #a8bdb0;
+}
+
+QPushButton#IconButton:pressed {
+  background: #e0ede5;
+}
+
+QFrame#NoteContainer {
+  background: #ffffff;
+  border: 1px solid #dde7e1;
+  border-radius: 12px;
+}
+
+QLabel#NoteTitle {
+  color: #65766c;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+QLabel#NoteContent {
+  color: #1c2b24;
+  font-size: 14px;
+}
+
+QLabel[role="section"] {
+  color: #1c2b24;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+QLabel[role="empty"] {
+  background: #ffffff;
+  color: #65766c;
+  border: 1px dashed #c3d3c9;
+  border-radius: 12px;
+  padding: 24px;
+  font-size: 13px;
+}

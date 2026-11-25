@@ -14,6 +14,9 @@ public:
     explicit ContactService(IContactRepository& repo, QObject* parent = nullptr);
 
     bool add(Contact& contact, QString* error = nullptr);
+    bool update(const Contact& contact, QString* error = nullptr);
+    bool remove(qint64 id, QString* error = nullptr);
+    std::optional<Contact> getById(qint64 id, QString* error = nullptr);
     QList<Contact> getAll(QString* error = nullptr);
 
 signals:

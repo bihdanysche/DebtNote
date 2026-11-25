@@ -1,7 +1,9 @@
 #include "SQLiteContactRepository.h"
 #include "domain/entities/Contact.h"
 #include <qcoreapplication.h>
+#include <qdatetime.h>
 #include <qlist.h>
+#include <qlogging.h>
 #include <qnamespace.h>
 #include <qsqlquery.h>
 #include <QSqlError>
@@ -31,16 +33,70 @@ std::optional<qint64> SQLiteContactRepository::add(Contact& contact, QString* er
 };
 
 bool SQLiteContactRepository::update(const Contact& contact, QString* error) {
-    return false;
+    QSqlQuery query(m_db);
+
+    query.prepare(R"(
+        UPDATE contacts
+        SET first_name = :firstName,
+            last_name = :lastName,
+            note = :note,
+            created_at = :createdAt
+        WHERE id = :id
+    )");
+    
+    query.bindValue(":firstName", contact.firstName());
+    query.bindValue(":lastName", contact.lastName());
+    query.bindValue(":note", contact.note());
+    query.bindValue(":createdAt", contact.createdAt().toString(Qt::ISODate));
+    query.bindValue(":id", QString::number(contact.id()));
+
+    if (!query.exec()) {
+        if (error) *error = query.lastError().text();
+        return false;
+    }
+
+    return true;
 };
 
 bool SQLiteContactRepository::remove(qint64 id, QString* error) {
-    return false;
+    QSqlQuery query(m_db);
+
+    query.prepare(R"(
+        DELETE FROM contacts
+        WHERE id = :id
+    )");
+
+    query.bindValue(":id", id);
+    
+    if (!query.exec()) {
+        if (error) *error = query.lastError().text();
+        return false;
+    }
+
+    return true;
 };
 
 std::optional<Contact> SQLiteContactRepository::getById(qint64 id, QString* error) {
-    std::optional<Contact> c;
-    return c;
+    std::optional<Contact> result;
+    QSqlQuery query(m_db);
+
+    query.prepare(R"(
+        SELECT id, first_name, last_name, note, created_at
+        FROM contacts
+        WHERE id = :id
+    )");
+
+    query.bindValue(":id", id);
+
+    if (!query.exec()) {
+        if (error) *error = query.lastError().text();
+        return result;
+    }
+
+    query.next();
+    result = fromQuery(query);
+
+    return result;
 };
 
 QList<Contact> SQLiteContactRepository::getAll(QString* error) {

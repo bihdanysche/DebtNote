@@ -41,5 +41,5 @@ private:
     QString m_firstName;
     QString m_lastName;
     QString m_note;
-    QDateTime m_createdAt;
+    QDateTime m_createdAt = QDateTime::currentDateTime();
 };
