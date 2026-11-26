@@ -469,3 +469,54 @@ QFrame[item="payment"] QLabel[role="amount"] {
 #BalanceDescription[balance="neutral"] {
   color: #64746a;
 }
+
+/* HOME PAGE */
+
+/* BALANCE SUMMARY */
+QFrame#SummaryCard {
+  background: #ffffff;
+  border: 1px solid #dde7e1;
+  border-radius: 12px;
+}
+
+QFrame#SummaryCard[variant="positive"] {
+  background: #eaf5ed;
+  border-color: #d2e9d8;
+}
+
+QFrame#SummaryCard[variant="negative"] {
+  background: #fbeeee;
+  border-color: #f0d6d6;
+}
+
+QFrame#SummaryCard[variant="neutral"] {
+  background: #ffffff;
+  border-color: #dde7e1;
+}
+
+QLabel[role="cardTitle"] {
+  background: transparent;
+  color: #65766c;
+  font-size: 13px;
+}
+
+QLabel#SummaryAmount {
+  background: transparent;
+  color: #1c2b24;
+  font-size: 23px;
+  font-weight: 600;
+}
+
+QLabel#SummaryDescription {
+  background: transparent;
+  color: #65766c;
+  font-size: 12px;
+}
+
+QFrame#SummaryCard[variant="positive"] QLabel#SummaryAmount {
+  color: #27834b;
+}
+
+QFrame#SummaryCard[variant="negative"] QLabel#SummaryAmount {
+  color: #c44747;
+}

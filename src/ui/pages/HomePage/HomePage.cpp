@@ -1,16 +1,36 @@
 #include "HomePage.h"
+
+#include <QVBoxLayout>
+#include <QLabel>
+
+#include "services/PaymentService.h"
 #include "ui/mainwindow.h"
-#include <qboxlayout.h>
-#include <qlabel.h>
+#include "BalanceWidget/BalanceWidget.h"
 
 HomePage::HomePage(MainWindow* mv)
     : QWidget(mv)
 {
-    QVBoxLayout *lay = new QVBoxLayout(this);
-    lay->setContentsMargins(10, 10, 10, 10);
-    lay->setSpacing(0);
+    QVBoxLayout* mainLayout = new QVBoxLayout(this);
+    mainLayout->setContentsMargins(24, 24, 24, 24);
+    mainLayout->setSpacing(16);
 
-    QLabel *tempLbl = new QLabel("This is a home page!");
-    lay->addWidget(tempLbl);
-    lay->addStretch();
+    QLabel* title = new QLabel("Головна", this);
+    title->setObjectName("PageTitle");
+
+    m_balanceWidget = new BalanceWidget(mv);
+
+    mainLayout->addWidget(title);
+    mainLayout->addWidget(m_balanceWidget);
+    mainLayout->addStretch();
+
+    // Connect to updates
+    reload();
+    auto *paymentService = mv->services().paymentService;
+    connect(paymentService, &PaymentService::paymentsChanged, this, [this](){
+        reload();
+    });
+}
+
+void HomePage::reload() {
+    m_balanceWidget->reload();
 }

@@ -18,7 +18,7 @@ MainWindow::MainWindow(AppServices& services, QWidget *parent)
     : m_services(services), QMainWindow(parent)
 {
     setWindowTitle("DebtNote");
-    resize(700, 600);
+    resize(800, 550);
 
     QWidget* central = new QWidget(this);
     QHBoxLayout* lay = new QHBoxLayout(central);
@@ -71,6 +71,12 @@ void MainWindow::initStackedWidget() {
     // ContactDetailsPage signals
     connect(m_contactDetailsPage, &ContactDetailsPage::requestedContactCtxMenu, this, [this](const Contact& contact, QWidget* parent) {
         m_contactsPage->showContactItemMenu(contact, parent, true);
+    });
+
+    // HomePage signals
+    connect(m_homePage, &HomePage::viewContactRequested, this, [this](qint64 id) {
+        m_contactDetailsPage->showContact(id);
+        switchToScreen(Screen::ContactDetails);
     });
 }
 

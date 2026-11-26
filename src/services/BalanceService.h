@@ -3,6 +3,7 @@
 #include <QHash>
 #include <QString>
 
+#include "domain/entities/Contact.h"
 #include "domain/valueobjects/Money.h"
 
 struct AppServices;
@@ -18,7 +19,7 @@ public:
     explicit BalanceService(AppServices& services);
 
     Money balanceForContact(qint64 contactId, QString* error = nullptr);
-    QHash<qint64, Money> balancesByContact(QString* error = nullptr);
+    QHash<Contact, Money> balancesByContact(QString* error = nullptr);
     BalanceSummary summary(QString* error = nullptr);
 
 private:

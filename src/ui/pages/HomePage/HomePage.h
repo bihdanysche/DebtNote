@@ -1,13 +1,19 @@
 #pragma once
 
 #include <QWidget>
-#include <qwidget.h>
 
 class MainWindow;
+class BalanceWidget;
 
 class HomePage : public QWidget {
-    Q_OBJECT;
+    Q_OBJECT
 
 public:
-    explicit HomePage(MainWindow* mainWindow);
+    explicit HomePage(MainWindow* mv);
+
+    void reload();
+signals:
+    void viewContactRequested(qint64 id);
+private:
+    BalanceWidget* m_balanceWidget;
 };

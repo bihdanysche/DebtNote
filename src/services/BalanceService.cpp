@@ -2,7 +2,6 @@
 
 #include <QList>
 
-#include "domain/entities/Payment.h"
 #include "services/AppServices.h"
 #include "services/PaymentService.h"
 
@@ -21,12 +20,14 @@ Money BalanceService::balanceForContact(qint64 contactId, QString* error) {
     return balance;
 }
 
-QHash<qint64, Money> BalanceService::balancesByContact(QString* error) {
-    QHash<qint64, Money> balances;
+QHash<Contact, Money> BalanceService::balancesByContact(QString* error) {
+    QHash<Contact, Money> balances;
 
     const QList<Payment> payments = m_services.paymentService->getAll(error);
     for (const Payment& payment : payments) {
-        balances[payment.contactId()] += payment.signedAmount();
+        Contact temp("NOT LOADED");
+        temp.setId(payment.contactId());
+        balances[temp] += payment.signedAmount();
     }
 
     return balances;
@@ -35,7 +36,7 @@ QHash<qint64, Money> BalanceService::balancesByContact(QString* error) {
 BalanceSummary BalanceService::summary(QString* error) {
     BalanceSummary result;
 
-    const QHash<qint64, Money> balances = balancesByContact(error);
+    const QHash<Contact, Money> balances = balancesByContact(error);
     for (const Money& balance : balances) {
         if (balance.isPositive()) {
             result.owedToMe += balance;

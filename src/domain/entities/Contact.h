@@ -36,6 +36,10 @@ public:
 
     const QDateTime& createdAt() const { return m_createdAt; };
     void setCreatedAt(const QDateTime& createdAt) { m_createdAt = createdAt; };
+
+    bool operator==(const Contact &other) const {
+        return m_id == other.id();
+    }
 private:
     qint64 m_id = 0;
     QString m_firstName;
@@ -43,3 +47,7 @@ private:
     QString m_note;
     QDateTime m_createdAt = QDateTime::currentDateTime();
 };
+
+inline size_t qHash(const Contact &contact, size_t seed = 0) {
+    return qHash(contact.id(), seed);
+}
