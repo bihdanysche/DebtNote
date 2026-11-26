@@ -1,4 +1,3 @@
-// DebtNoteApp.h
 #include <memory>
 #include <QApplication>
 #include "data/database/Database.h"
@@ -9,6 +8,7 @@ class ContactService;
 class SQLitePaymentRepository;
 class PaymentService;
 class MainWindow;
+class BalanceService;
 
 class DebtNoteApp : public QApplication {
 public:
@@ -31,6 +31,8 @@ private:
 
     std::unique_ptr<SQLitePaymentRepository> m_paymentsRepo;
     std::unique_ptr<PaymentService> m_paymentService;
+
+    std::unique_ptr<BalanceService> m_balanceService;
 
     AppServices m_appServices;
     std::unique_ptr<MainWindow> m_window;

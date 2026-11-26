@@ -2,6 +2,7 @@
 
 #include <QApplication>
 #include <QMessageBox>
+#include <memory>
 #include <qcoreapplication.h>
 #include <qdir.h>
 #include <qlist.h>
@@ -11,6 +12,7 @@
 #include "data/repositories/SQLiteContactRepository.h"
 #include "data/repositories/SQLitePaymentRepository.h"
 #include "services/AppServices.h"
+#include "services/BalanceService.h"
 #include "services/PaymentService.h"
 #include "ui/mainwindow.h"
 #include "services/ContactService.h"
@@ -63,8 +65,11 @@ void DebtNoteApp::initAppServices() {
     m_paymentsRepo = std::make_unique<SQLitePaymentRepository>(m_db.connection());
     m_paymentService = std::make_unique<PaymentService>(*m_paymentsRepo);
 
+    m_balanceService = std::make_unique<BalanceService>(m_appServices);
+
     m_appServices.contactService = m_contactsService.get();
     m_appServices.paymentService = m_paymentService.get();
+    m_appServices.balanceService = m_balanceService.get();
 }
 
 void DebtNoteApp::loadAppStyle() {
