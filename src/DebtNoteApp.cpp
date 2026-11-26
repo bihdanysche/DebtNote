@@ -9,7 +9,9 @@
 #include <qmessagebox.h>
 #include "data/database/Database.h"
 #include "data/repositories/SQLiteContactRepository.h"
+#include "data/repositories/SQLitePaymentRepository.h"
 #include "services/AppServices.h"
+#include "services/PaymentService.h"
 #include "ui/mainwindow.h"
 #include "services/ContactService.h"
 #include <QFontDatabase>
@@ -58,7 +60,11 @@ void DebtNoteApp::initAppServices() {
     m_contactsRepo = std::make_unique<SQLiteContactRepository>(m_db.connection());
     m_contactsService = std::make_unique<ContactService>(*m_contactsRepo);
 
+    m_paymentsRepo = std::make_unique<SQLitePaymentRepository>(m_db.connection());
+    m_paymentService = std::make_unique<PaymentService>(*m_paymentsRepo);
+
     m_appServices.contactService = m_contactsService.get();
+    m_appServices.paymentService = m_paymentService.get();
 }
 
 void DebtNoteApp::loadAppStyle() {

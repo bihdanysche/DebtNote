@@ -195,18 +195,113 @@ QMenu::item:pressed {
   font-weight: 600;
 }
 QLineEdit,
-QTextEdit {
+QTextEdit,
+QComboBox,
+QDoubleSpinBox,
+QDateTimeEdit {
   padding: 10px;
   background: white;
   border: 1px solid #c3d3c9;
   border-radius: 8px;
 }
 QLineEdit:focus,
-QTextEdit:focus {
+QTextEdit:focus,
+QComboBox:focus,
+QDoubleSpinBox:focus,
+QDateTimeEdit:focus {
   background: #fefffe;
   border-color: #d5e4db;
 }
 
+QComboBox::drop-down {
+  border: none;
+  width: 0px;
+}
+
+QComboBox::down-arrow {
+  image: none;
+  width: 0px;
+  height: 0px;
+}
+
+QDateTimeEdit::up-button,
+QDateTimeEdit::down-button,
+QDateEdit::up-button,
+QDateEdit::down-button {
+  width: 0px;
+  border: none;
+}
+
+QDateTimeEdit::up-arrow,
+QDateTimeEdit::down-arrow,
+QDateEdit::up-arrow,
+QDateEdit::down-arrow {
+  image: none;
+}
+
+/* CALENDAR */
+QCalendarWidget {
+  background-color: #ffffff;
+  color: #1c2b24;
+  border: 1px solid #d5ded8;
+}
+
+QCalendarWidget QWidget#qt_calendar_navigationbar {
+  background-color: #f3f7f4;
+}
+
+QCalendarWidget QToolButton {
+  color: #1c2b24;
+  background-color: transparent;
+  border: none;
+  border-radius: 6px;
+  padding: 6px;
+}
+
+QCalendarWidget QToolButton:hover {
+  background-color: #e3eee7;
+}
+
+QCalendarWidget QToolButton#qt_calendar_monthbutton,
+QCalendarWidget QToolButton#qt_calendar_yearbutton {
+  font-weight: 600;
+}
+
+QCalendarWidget QAbstractItemView {
+  background-color: #ffffff;
+  color: #1c2b24;
+  selection-background-color: #6ba888;
+  selection-color: #ffffff;
+  outline: none;
+  border: none;
+}
+QCalendarWidget QAbstractItemView::item:hover {
+  background-color: #e3eee7;
+  color: #1c2b24;
+}
+
+QCalendarWidget QAbstractItemView::item:selected {
+  background-color: #6ba888;
+  color: #ffffff;
+}
+
+QCalendarWidget QAbstractItemView:disabled {
+  color: #aab7ae;
+}
+
+QDateTimeEdit::drop-down {
+  subcontrol-origin: padding;
+  subcontrol-position: top right;
+  width: 20px;
+  border: none;
+  background: transparent;
+}
+
+QDateTimeEdit::down-arrow {
+  image: none;
+  width: 0px;
+  height: 0px;
+}
 /* CONTACT DETAILS PAGE */
 QWidget[page="contactDetails"] {
   background: #f3f8f5;
@@ -264,4 +359,46 @@ QLabel[role="empty"] {
   border-radius: 12px;
   padding: 24px;
   font-size: 13px;
+}
+
+/* CONTACT DETAILS / PAYMENTS */
+QFrame[item="payment"] {
+  background: #ffffff;
+  border: 1px solid #dde7e1;
+  border-radius: 12px;
+}
+QFrame[item="payment"]:hover {
+  background: #edf5f0;
+  border-color: #c9d8cf;
+}
+QFrame[item="payment"] QLabel {
+  background: transparent;
+}
+QFrame[item="payment"] QLabel[role="comment"] {
+  font-size: 15px;
+}
+QFrame[item="payment"] QLabel[role="comment"][muted="true"] {
+  color: #a6b5ab;
+}
+QFrame[item="payment"] QLabel[role="date"] {
+  color: #65766c;
+  font-size: 12px;
+}
+QFrame[item="payment"] QLabel[role="amount"] {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* PAYMENT MODAL */
+[modal="paymentForm"] QLabel[role="hint"] {
+  color: #65766c;
+  font-size: 12px;
+}
+
+[modal="paymentForm"] QComboBox QAbstractItemView {
+  background: #ffffff;
+  border: 1px solid #dde7e1;
+  selection-background-color: #e4f3ea;
+  selection-color: #547261;
+  outline: 0;
 }

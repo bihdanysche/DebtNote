@@ -10,6 +10,9 @@ class QLabel;
 class QVBoxLayout;
 class QFrame;
 
+class Payment;
+class PaymentService;
+class PaymentFormModal;
 
 class ContactDetailsPage : public QWidget {
     Q_OBJECT
@@ -36,4 +39,13 @@ private:
     QLabel* m_titleLabel;
     QLabel* m_noteLabel;
     QVBoxLayout* m_paymentsLayout;
+
+    void reloadPayments();
+    void clearPayments();
+    void onAddPaymentRequested();
+    void onPaymentEditRequested(const Payment& payment);
+    void onPaymentDeleteRequested(const Payment& payment);
+
+    PaymentService* m_paymentsService;
+    PaymentFormModal* m_paymentForm = nullptr;
 };

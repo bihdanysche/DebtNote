@@ -6,6 +6,8 @@
 
 class SQLiteContactRepository;
 class ContactService;
+class SQLitePaymentRepository;
+class PaymentService;
 class MainWindow;
 
 class DebtNoteApp : public QApplication {
@@ -26,6 +28,9 @@ private:
 
     std::unique_ptr<SQLiteContactRepository> m_contactsRepo;
     std::unique_ptr<ContactService> m_contactsService;
+
+    std::unique_ptr<SQLitePaymentRepository> m_paymentsRepo;
+    std::unique_ptr<PaymentService> m_paymentService;
 
     AppServices m_appServices;
     std::unique_ptr<MainWindow> m_window;
