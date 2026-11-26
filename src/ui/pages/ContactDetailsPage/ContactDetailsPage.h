@@ -12,7 +12,9 @@ class QFrame;
 
 class Payment;
 class PaymentService;
+class BalanceService;
 class PaymentFormModal;
+class ConfirmDialog;
 
 class ContactDetailsPage : public QWidget {
     Q_OBJECT
@@ -33,12 +35,22 @@ private:
 
     ContactService* m_contactsService;
     Toast* m_toast;
+    ConfirmDialog* m_dialog;
     qint64 m_contactId = 0;
 
     QFrame* m_noteContainer;
     QLabel* m_titleLabel;
     QLabel* m_noteLabel;
     QVBoxLayout* m_paymentsLayout;
+
+    BalanceService* m_balanceService;
+
+    QFrame* m_balanceContainer;
+    QLabel* m_balanceAmount;
+    QLabel* m_balanceDescription;
+
+    void reloadBalance();
+    void resetBalance();
 
     void reloadPayments();
     void clearPayments();

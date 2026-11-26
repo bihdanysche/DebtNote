@@ -12,7 +12,7 @@ public:
 
     qint64 kopecks() const { return m_kopecks; }
     double toHryvnias() const { return m_kopecks / 100.0; }
-    QString toString() const;
+    QString toString(bool ignoreSign=false) const;
 
     bool isZero() const { return m_kopecks == 0; }
     bool isPositive() const { return m_kopecks > 0; }

@@ -10,13 +10,16 @@
 #include <QSize>
 #include <QVBoxLayout>
 #include <optional>
+#include <qstyle.h>
 
 #include "PaymentFormModal/PaymentFormModal.h"
 #include "PaymentItem/PaymentItem.h"
 #include "domain/entities/Contact.h"
 #include "domain/entities/Payment.h"
+#include "services/BalanceService.h"
 #include "services/ContactService.h"
 #include "services/PaymentService.h"
+#include "ui/common/confirmDialog/ConfirmDialog.h"
 #include "ui/common/toasts/toast.h"
 #include "ui/mainwindow.h"
 
@@ -25,7 +28,9 @@ ContactDetailsPage::ContactDetailsPage(MainWindow* mv)
     , m_contactsService(mv->services().contactService)
     , m_paymentsService(mv->services().paymentService)
     , m_toast(mv->uiInstances().toast)
+    , m_dialog(mv->uiInstances().confirmDialog)
     , m_paymentForm(new PaymentFormModal(mv))
+    , m_balanceService(mv->services().balanceService)
 {
     setProperty("page", "contactDetails");
 
@@ -33,6 +38,7 @@ ContactDetailsPage::ContactDetailsPage(MainWindow* mv)
     mainLayout->setContentsMargins(24, 24, 24, 24);
     mainLayout->setSpacing(12);
 
+    // Header
     auto* headerLayout = new QHBoxLayout();
     headerLayout->setContentsMargins(0, 0, 0, 0);
     headerLayout->setSpacing(0);
@@ -53,6 +59,7 @@ ContactDetailsPage::ContactDetailsPage(MainWindow* mv)
     headerLayout->addWidget(moreButton);
     mainLayout->addLayout(headerLayout);
 
+    // Note section
     m_noteContainer = new QFrame(this);
     m_noteContainer->setObjectName("NoteContainer");
 
@@ -73,8 +80,32 @@ ContactDetailsPage::ContactDetailsPage(MainWindow* mv)
     m_noteContainer->hide();
     mainLayout->addWidget(m_noteContainer);
 
-    mainLayout->addSpacing(12);
+    // Balance section
+    m_balanceContainer = new QFrame(this);
+    m_balanceContainer->setObjectName("BalanceContainer");
 
+    auto* balanceLayout = new QVBoxLayout(m_balanceContainer);
+    balanceLayout->setContentsMargins(16, 14, 16, 14);
+    balanceLayout->setSpacing(6);
+
+    auto* balanceTitle = new QLabel("Поточний баланс", m_balanceContainer);
+    balanceTitle->setProperty("role", "section");
+
+    m_balanceAmount = new QLabel("0,00 ₴", m_balanceContainer);
+    m_balanceAmount->setObjectName("BalanceAmount");
+
+    m_balanceDescription = new QLabel("", m_balanceContainer);
+    m_balanceDescription->setObjectName("BalanceDescription");
+
+    balanceLayout->addWidget(balanceTitle);
+    balanceLayout->addWidget(m_balanceAmount);
+    balanceLayout->addWidget(m_balanceDescription);
+
+    mainLayout->addWidget(m_balanceContainer);
+
+    mainLayout->addSpacing(12);
+    
+    // Payments
     auto* paymentsHeader = new QHBoxLayout();
     paymentsHeader->setContentsMargins(0, 0, 0, 0);
 
@@ -110,6 +141,7 @@ ContactDetailsPage::ContactDetailsPage(MainWindow* mv)
     connect(m_paymentsService, &PaymentService::paymentsChanged, this, [this]() {
         if (isVisible()) {
             reloadPayments();
+            reloadBalance();
         }
     });
     connect(moreButton, &QPushButton::pressed, this, [this, moreButton]() {
@@ -156,6 +188,7 @@ void ContactDetailsPage::reload() {
     m_contact = *contact;
 
     reloadPayments();
+    reloadBalance();
 }
 
 void ContactDetailsPage::clearPayments() {
@@ -213,25 +246,80 @@ void ContactDetailsPage::onAddPaymentRequested() {
     m_paymentForm->openForCreate(m_contactId);
 }
 
+void ContactDetailsPage::resetBalance() {
+    m_balanceAmount->setText("??? грн");
+    m_balanceContainer->setProperty("balance", "neutral");
+    m_balanceAmount->setProperty("balance", "neutral");
+    m_balanceDescription->setText("Взаєморозрахунки закриті");
+
+    m_balanceContainer->style()->unpolish(m_balanceContainer);
+    m_balanceContainer->style()->polish(m_balanceContainer);
+    m_balanceAmount->style()->unpolish(m_balanceAmount);
+    m_balanceAmount->style()->polish(m_balanceAmount);
+}
+
+void ContactDetailsPage::reloadBalance() {
+    if (m_contactId <= 0) {
+        resetBalance();
+        return;
+    }
+
+    QString error;
+    Money balance = m_balanceService->balanceForContact(m_contactId, &error);
+
+    if (!error.isEmpty()) {
+        m_toast->makeToast(error);
+        resetBalance();
+        return;
+    }
+
+    double amount = balance.toHryvnias();
+    double absoluteAmount = std::abs(amount);
+
+    m_balanceAmount->setText(
+        balance.toString()
+    );
+
+    if (amount > 0) {
+        m_balanceContainer->setProperty("balance", "positive");
+        m_balanceAmount->setProperty("balance", "positive");
+        m_balanceDescription->setText("Ця людина винна вам");
+    }
+    else if (amount < 0) {
+        m_balanceContainer->setProperty("balance", "negative");
+        m_balanceAmount->setProperty("balance", "negative");
+        m_balanceDescription->setText("Ви винні цій людині");
+    }
+    else {
+        m_balanceContainer->setProperty("balance", "neutral");
+        m_balanceAmount->setProperty("balance", "neutral");
+        m_balanceDescription->setText("Взаєморозрахунки закриті");
+    }
+
+    m_balanceContainer->style()->unpolish(m_balanceContainer);
+    m_balanceContainer->style()->polish(m_balanceContainer);
+    m_balanceAmount->style()->unpolish(m_balanceAmount);
+    m_balanceAmount->style()->polish(m_balanceAmount);
+}
+
 void ContactDetailsPage::onPaymentEditRequested(const Payment& payment) {
     m_paymentForm->openForEdit(payment);
 }
 
 void ContactDetailsPage::onPaymentDeleteRequested(const Payment& payment) {
-    const auto answer = QMessageBox::question(
-        this, "Видалення платежу",
-        "Видалити цей платіж?",
-        QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    DialogParams params;
+    params.title = "Видалення платежу";
+    params.desc = "Видалити цей платіж?";
+    
+    m_dialog->showDialog(params, [this, payment](int answ) {
+        if (answ != 1) return;
 
-    if (answer != QMessageBox::Yes) {
-        return;
-    }
+        QString error;
+        if (!m_paymentsService->remove(payment.id(), &error)) {
+            m_toast->makeToast(error);
+            return;
+        }
 
-    QString error;
-    if (!m_paymentsService->remove(payment.id(), &error)) {
-        m_toast->makeToast(error);
-        return;
-    }
-
-    m_toast->makeToast("Платіж видалено");
+        m_toast->makeToast("Платіж видалено");
+    });
 }

@@ -409,3 +409,60 @@ QFrame[item="payment"] QLabel[role="amount"] {
   selection-color: #547261;
   outline: 0;
 }
+
+/* CONTACT BALANCE */
+/* BALANCE */
+
+#BalanceContainer {
+  background-color: white;
+  border: 1px solid #e1e9e3;
+  border-radius: 12px;
+}
+
+#BalanceAmount {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+#BalanceDescription {
+  font-size: 13px;
+}
+
+#BalanceContainer[balance="positive"] {
+  background-color: #eaf5ed;
+  border-color: #d2e9d8;
+}
+
+#BalanceAmount[balance="positive"] {
+  color: #27834b;
+}
+
+#BalanceDescription[balance="positive"] {
+  color: #27834b;
+}
+
+#BalanceContainer[balance="negative"] {
+  background-color: #fbeeee;
+  border-color: #f0d6d6;
+}
+
+#BalanceAmount[balance="negative"] {
+  color: #c44747;
+}
+
+#BalanceDescription[balance="negative"] {
+  color: #c44747;
+}
+
+#BalanceContainer[balance="neutral"] {
+  background-color: white;
+  border-color: #e1e9e3;
+}
+
+#BalanceAmount[balance="neutral"] {
+  color: #64746a;
+}
+
+#BalanceDescription[balance="neutral"] {
+  color: #64746a;
+}

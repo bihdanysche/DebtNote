@@ -6,9 +6,11 @@ Money Money::fromHryvnias(double hryvnias) {
     return Money(qRound64(hryvnias * 100.0));
 }
 
-QString Money::toString() const {
+QString Money::toString(bool ignoreSign) const {
     const qint64 absolute = qAbs(m_kopecks);
-    const QString sign = m_kopecks < 0 ? "-" : "";
+    QString sign = m_kopecks < 0 ? "-" : "";
+    
+    if (ignoreSign) sign = "";
 
     return QString("%1%2.%3 грн")
         .arg(sign)
