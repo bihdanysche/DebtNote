@@ -1,4 +1,5 @@
 #include "SQLitePaymentRepository.h"
+#include "data/repositories/SQLiteContactRepository.h"
 #include "domain/valueobjects/PaymentType.h"
 
 #include <QSqlError>
@@ -145,6 +146,44 @@ QList<Payment> SQLitePaymentRepository::getAll(QString* error) {
 
     return payments;
 };
+
+QHash<Contact, Money> SQLitePaymentRepository::balancesByContact(QString* error) {
+    QHash<Contact, Money> result;
+    QSqlQuery query(m_db);
+
+    if (!query.exec(R"(
+        SELECT
+            c.id,
+            c.first_name,
+            c.last_name,
+            c.note,
+            c.created_at,
+            COALESCE(SUM(
+                CASE
+                    WHEN p.type IN (0, 3) THEN p.amount
+                    WHEN p.type IN (1, 2) THEN -p.amount
+                    ELSE 0
+                END
+            ), 0) AS balance
+        FROM contacts c
+        LEFT JOIN payments p ON p.contact_id = c.id
+        GROUP BY c.id
+    )")) {
+        const QString msg = query.lastError().text();
+        qWarning() << "SQLitePaymentRepository::balancesByContact failed:" << msg;
+        if (error) *error = msg;
+        return {};
+    }
+
+    while (query.next()) {
+        Contact contact = SQLiteContactRepository::fromQuery(query);
+        Money balance(query.value("balance").toLongLong());
+
+        result.insert(contact, balance);
+    }
+
+    return result;
+}
 
 Payment SQLitePaymentRepository::fromQuery(const QSqlQuery& query) {
     Payment payment;

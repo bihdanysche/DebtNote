@@ -1,12 +1,15 @@
 #include "BalanceService.h"
 
 #include <QList>
+#include <qhashfunctions.h>
+#include <qlogging.h>
 
 #include "services/AppServices.h"
+#include "services/ErrorMessages.h"
 #include "services/PaymentService.h"
 
-BalanceService::BalanceService(AppServices& services)
-    : m_services(services)
+BalanceService::BalanceService(IPaymentRepository& paymentRepo, AppServices& services)
+    : m_services(services), m_paymentRepo(paymentRepo)
 {}
 
 Money BalanceService::balanceForContact(qint64 contactId, QString* error) {
@@ -21,16 +24,17 @@ Money BalanceService::balanceForContact(qint64 contactId, QString* error) {
 }
 
 QHash<Contact, Money> BalanceService::balancesByContact(QString* error) {
-    QHash<Contact, Money> balances;
+    QString msg;
+    
+    auto result = m_paymentRepo.balancesByContact(&msg);
 
-    const QList<Payment> payments = m_services.paymentService->getAll(error);
-    for (const Payment& payment : payments) {
-        Contact temp("NOT LOADED");
-        temp.setId(payment.contactId());
-        balances[temp] += payment.signedAmount();
+    if (!msg.isEmpty()) {
+        if (error) *error = kDatabaseError;
+        qWarning() << "BalanceService::balancesByContact failed: " << msg;
+        return {};
     }
 
-    return balances;
+    return result;
 }
 
 BalanceSummary BalanceService::summary(QString* error) {

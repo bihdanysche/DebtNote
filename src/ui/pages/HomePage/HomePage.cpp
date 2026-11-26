@@ -6,6 +6,7 @@
 #include "services/PaymentService.h"
 #include "ui/mainwindow.h"
 #include "BalanceWidget/BalanceWidget.h"
+#include "ui/pages/HomePage/ActiveContactsWidget/ActiveContactsWidget.h"
 
 HomePage::HomePage(MainWindow* mv)
     : QWidget(mv)
@@ -18,10 +19,11 @@ HomePage::HomePage(MainWindow* mv)
     title->setObjectName("PageTitle");
 
     m_balanceWidget = new BalanceWidget(mv);
+    m_activeContactsWidget = new ActiveContactsWidget(mv);
 
     mainLayout->addWidget(title);
     mainLayout->addWidget(m_balanceWidget);
-    mainLayout->addStretch();
+    mainLayout->addWidget(m_activeContactsWidget, 1);
 
     // Connect to updates
     reload();
@@ -29,8 +31,10 @@ HomePage::HomePage(MainWindow* mv)
     connect(paymentService, &PaymentService::paymentsChanged, this, [this](){
         reload();
     });
+    connect(m_activeContactsWidget, &ActiveContactsWidget::showContactRequested, this, &HomePage::viewContactRequested);
 }
 
 void HomePage::reload() {
     m_balanceWidget->reload();
+    m_activeContactsWidget->reload();
 }

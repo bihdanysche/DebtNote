@@ -4,6 +4,7 @@
 
 class MainWindow;
 class BalanceWidget;
+class ActiveContactsWidget;
 
 class HomePage : public QWidget {
     Q_OBJECT
@@ -16,4 +17,5 @@ signals:
     void viewContactRequested(qint64 id);
 private:
     BalanceWidget* m_balanceWidget;
+    ActiveContactsWidget* m_activeContactsWidget;
 };

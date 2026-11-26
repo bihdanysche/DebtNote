@@ -4,6 +4,7 @@
 #include <QString>
 
 #include "domain/entities/Contact.h"
+#include "domain/repositories/IPaymentRepository.h"
 #include "domain/valueobjects/Money.h"
 
 struct AppServices;
@@ -16,12 +17,13 @@ struct BalanceSummary {
 
 class BalanceService {
 public:
-    explicit BalanceService(AppServices& services);
+    explicit BalanceService(IPaymentRepository& paymentRepo, AppServices& services);
 
     Money balanceForContact(qint64 contactId, QString* error = nullptr);
     QHash<Contact, Money> balancesByContact(QString* error = nullptr);
     BalanceSummary summary(QString* error = nullptr);
 
 private:
+    IPaymentRepository& m_paymentRepo;
     AppServices& m_services;
 };

@@ -65,7 +65,7 @@ void DebtNoteApp::initAppServices() {
     m_paymentsRepo = std::make_unique<SQLitePaymentRepository>(m_db.connection());
     m_paymentService = std::make_unique<PaymentService>(*m_paymentsRepo);
 
-    m_balanceService = std::make_unique<BalanceService>(m_appServices);
+    m_balanceService = std::make_unique<BalanceService>(*m_paymentsRepo, m_appServices);
 
     m_appServices.contactService = m_contactsService.get();
     m_appServices.paymentService = m_paymentService.get();

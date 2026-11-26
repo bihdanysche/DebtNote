@@ -129,11 +129,14 @@ QList<Contact> SQLiteContactRepository::getAll(QString* error) {
 Contact SQLiteContactRepository::fromQuery(const QSqlQuery& query) {
     Contact contact;
 
-    contact.setId(query.value(0).toLongLong());
-    contact.setFirstName(query.value(1).toString());
-    contact.setLastName(query.value(2).toString());
-    contact.setNote(query.value(3).toString());
-    contact.setCreatedAt(QDateTime::fromString(query.value(4).toString(), Qt::ISODate));
+    contact.setId(query.value("id").toLongLong());
+    contact.setFirstName(query.value("first_name").toString());
+    contact.setLastName(query.value("last_name").toString());
+    contact.setNote(query.value("note").toString());
+    contact.setCreatedAt(QDateTime::fromString(
+        query.value("created_at").toString(),
+        Qt::ISODate
+    ));
 
     return contact;
 }

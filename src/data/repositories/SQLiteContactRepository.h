@@ -15,7 +15,7 @@ public:
 
     std::optional<Contact> getById(qint64 id, QString* error = nullptr) override;
     QList<Contact> getAll(QString* error = nullptr) override;
-private:
     static Contact fromQuery(const QSqlQuery& query);
+private:
     QSqlDatabase m_db;
 };

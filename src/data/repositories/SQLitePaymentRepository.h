@@ -3,6 +3,7 @@
 #include <QSqlDatabase>
 #include <QSqlQuery>
 
+#include "domain/entities/Contact.h"
 #include "domain/repositories/IPaymentRepository.h"
 
 class SQLitePaymentRepository : public IPaymentRepository {
@@ -17,8 +18,9 @@ public:
     QList<Payment> getByContact(qint64 contactId, QString* error = nullptr) override;
     QList<Payment> getAll(QString* error = nullptr) override;
 
-private:
+    QHash<Contact, Money> balancesByContact(QString* error) override;
+    
     static Payment fromQuery(const QSqlQuery& query);
-
+private:
     QSqlDatabase m_db;
 };
