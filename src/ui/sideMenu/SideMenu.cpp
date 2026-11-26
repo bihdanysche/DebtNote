@@ -7,16 +7,16 @@ SideMenu::SideMenu(const QList<SideNavButtonInfo>& buttons, QWidget* parent)
     : QFrame(parent)
 {
     setObjectName("SideMenu");
-    setFixedWidth(140);
+    setFixedWidth(120);
 
     auto* layout = new QVBoxLayout(this);
-    layout->setContentsMargins(8, 20, 8, 12);
-    layout->setSpacing(8);
+    layout->setContentsMargins(0,0,0,0);
+    layout->setSpacing(0);
 
     for (const SideNavButtonInfo& info : buttons) {
         auto* button = new SideNavButton(info, this);
         m_buttons.insert(info.id, button);
-        layout->addWidget(button, 0, Qt::AlignHCenter);
+        layout->addWidget(button);
 
         connect(button, &QPushButton::clicked, this, [this, id = info.id]() {
             setSelected(id);

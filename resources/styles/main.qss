@@ -74,12 +74,14 @@ QPushButton[variant="danger"]:disabled {
 QPushButton#SideNavButton {
   background: transparent;
   border: none;
-  border-radius: 12px;
+  border-radius: 0;
   padding: 0;
 }
+
 QPushButton#SideNavButton:hover {
-  background: #edf5f0;
+  background: #f3f5f3;
 }
+
 QPushButton#SideNavButton[selected="true"] {
   background: #e4f3ea;
 }
@@ -89,6 +91,7 @@ QPushButton#SideNavButton QLabel {
   color: #65766c;
   font-size: 12px;
 }
+
 QPushButton#SideNavButton[selected="true"] QLabel {
   color: #206940;
   font-weight: 600;

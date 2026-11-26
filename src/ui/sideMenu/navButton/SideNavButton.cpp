@@ -9,12 +9,12 @@ SideNavButton::SideNavButton(const SideNavButtonInfo& info, QWidget* parent)
     : QPushButton(parent)
 {
     setObjectName("SideNavButton");
-    setFixedSize(85, 85);
+    setFixedSize(120, 85);
     setCursor(Qt::PointingHandCursor);
     setProperty("selected", false);
 
     auto* layout = new QVBoxLayout(this);
-    layout->setContentsMargins(4, 10, 4, 6);
+    layout->setContentsMargins(4, 8, 4, 8);
     layout->setSpacing(2);
 
     auto* iconLabel = new QLabel(this);
