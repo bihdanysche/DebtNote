@@ -10,6 +10,7 @@
 #include <QShortcut>
 #include <QVBoxLayout>
 
+#include "domain/valueobjects/PaymentType.h"
 #include "services/PaymentService.h"
 #include "ui/common/dialogBase/DialogBase.h"
 #include "ui/common/toasts/toast.h"
@@ -40,10 +41,9 @@ PaymentFormModal::PaymentFormModal(MainWindow* mv)
     };
 
     m_typeCombo = new QComboBox(innerFrame);
-    m_typeCombo->addItem("Я дав у борг", static_cast<int>(PaymentDirection::Lent));
-    m_typeCombo->addItem("Я взяв у борг", static_cast<int>(PaymentDirection::Borrowed));
-    m_typeCombo->addItem("Мені повернули борг", static_cast<int>(PaymentDirection::Borrowed));
-    m_typeCombo->addItem("Я повернув борг", static_cast<int>(PaymentDirection::Lent));
+    for (PaymentType type : {PaymentType::Lent, PaymentType::Borrowed, PaymentType::ReceivedBack, PaymentType::PaidBack}) {
+        m_typeCombo->addItem(paymentTypeTitle(type), static_cast<int>(type));
+    }
     addField("Тип операції", m_typeCombo);
 
     m_hintLabel = new QLabel(innerFrame);
@@ -122,8 +122,8 @@ void PaymentFormModal::openForEdit(const Payment& payment) {
 }
 
 void PaymentFormModal::fillFields(const Payment& payment) {
-    const int index = m_typeCombo->findData(static_cast<int>(payment.direction()));
-    m_typeCombo->setCurrentIndex(index < 0 ? 0 : index);
+    const int index = m_typeCombo->findData(static_cast<int>(payment.type()));
+    m_typeCombo->setCurrentIndex(index);
     updateHint();
 
     m_amountEdit->setValue(payment.amount().toHryvnias());
@@ -150,7 +150,7 @@ void PaymentFormModal::updateHint() {
 
 void PaymentFormModal::submit() {
     Payment payment = m_payment;
-    payment.setDirection(static_cast<PaymentDirection>(m_typeCombo->currentData().toInt()));
+    payment.setType(static_cast<PaymentType>(m_typeCombo->currentData().toInt()));
     payment.setAmount(Money::fromHryvnias(m_amountEdit->value()));
     payment.setDateTime(m_dateTimeEdit->dateTime());
     payment.setComment(m_commentEdit->text().trimmed());

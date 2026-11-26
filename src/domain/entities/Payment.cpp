@@ -2,7 +2,7 @@
 
 Payment::Payment(
     qint64 contactId, const Money& amount,
-    PaymentDirection direction,
+    PaymentType type,
     const QDateTime& dateTime,
     const QString& comment,
     qint64 id
@@ -10,13 +10,21 @@ Payment::Payment(
     : m_id(id),
       m_contactId(contactId),
       m_amount(amount),
-      m_direction(direction),
+      m_type(type),
       m_dateTime(dateTime),
       m_comment(comment)
 {}
 
 Money Payment::signedAmount() const {
-    return m_direction == PaymentDirection::Lent ? m_amount : -m_amount;
+    switch (m_type) {
+        case PaymentType::Lent:
+        case PaymentType::PaidBack:
+            return m_amount;
+        case PaymentType::Borrowed:
+        case PaymentType::ReceivedBack:
+            return -m_amount;
+        }
+    return Money();
 }
 
 QStringList Payment::validate() const {

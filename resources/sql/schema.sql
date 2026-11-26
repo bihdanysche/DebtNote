@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS payments (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     contact_id  INTEGER NOT NULL REFERENCES contacts(id) ON DELETE CASCADE,
     amount      INTEGER NOT NULL CHECK (amount > 0),
-    direction   INTEGER NOT NULL CHECK (direction IN (0, 1)),
+    type        INTEGER NOT NULL CHECK (type IN (0, 1, 2, 3)),
     date_time   TEXT NOT NULL,
     comment     TEXT
 );

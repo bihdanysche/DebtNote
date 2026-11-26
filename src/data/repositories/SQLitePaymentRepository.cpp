@@ -1,4 +1,5 @@
 #include "SQLitePaymentRepository.h"
+#include "domain/valueobjects/PaymentType.h"
 
 #include <QSqlError>
 #include <QVariant>
@@ -11,13 +12,13 @@ std::optional<qint64> SQLitePaymentRepository::add(const Payment& payment, QStri
     QSqlQuery query(m_db);
 
     query.prepare(R"(
-        INSERT INTO payments (contact_id, amount, direction, date_time, comment)
-        VALUES (:contact_id, :amount, :direction, :date_time, :comment)
+        INSERT INTO payments (contact_id, amount, type, date_time, comment)
+        VALUES (:contact_id, :amount, :type, :date_time, :comment)
     )");
 
     query.bindValue(":contact_id", payment.contactId());
     query.bindValue(":amount", payment.amount().kopecks());
-    query.bindValue(":direction", static_cast<int>(payment.direction()));
+    query.bindValue(":type", static_cast<int>(payment.type()));
     query.bindValue(":date_time", payment.dateTime().toString(Qt::ISODate));
     query.bindValue(":comment", payment.comment());
 
@@ -36,7 +37,7 @@ bool SQLitePaymentRepository::update(const Payment& payment, QString* error) {
         UPDATE payments
         SET contact_id = :contact_id,
             amount = :amount,
-            direction = :direction,
+            type = :type,
             date_time = :date_time,
             comment = :comment
         WHERE id = :id
@@ -44,7 +45,7 @@ bool SQLitePaymentRepository::update(const Payment& payment, QString* error) {
 
     query.bindValue(":contact_id", payment.contactId());
     query.bindValue(":amount", payment.amount().kopecks());
-    query.bindValue(":direction", static_cast<int>(payment.direction()));
+    query.bindValue(":type", static_cast<int>(payment.type()));
     query.bindValue(":date_time", payment.dateTime().toString(Qt::ISODate));
     query.bindValue(":comment", payment.comment());
     query.bindValue(":id", payment.id());
@@ -79,7 +80,7 @@ std::optional<Payment> SQLitePaymentRepository::getById(qint64 id, QString* erro
     QSqlQuery query(m_db);
 
     query.prepare(R"(
-        SELECT id, contact_id, amount, direction, date_time, comment
+        SELECT id, contact_id, amount, type, date_time, comment
         FROM payments
         WHERE id = :id
     )");
@@ -102,7 +103,7 @@ QList<Payment> SQLitePaymentRepository::getByContact(qint64 contactId, QString* 
     QSqlQuery query(m_db);
 
     query.prepare(R"(
-        SELECT id, contact_id, amount, direction, date_time, comment
+        SELECT id, contact_id, amount, type, date_time, comment
         FROM payments
         WHERE contact_id = :contact_id
         ORDER BY date_time DESC, id DESC
@@ -127,7 +128,7 @@ QList<Payment> SQLitePaymentRepository::getAll(QString* error) {
     QSqlQuery query(m_db);
 
     query.prepare(R"(
-        SELECT id, contact_id, amount, direction, date_time, comment
+        SELECT id, contact_id, amount, type, date_time, comment
         FROM payments
         ORDER BY date_time DESC, id DESC
     )");
@@ -151,7 +152,7 @@ Payment SQLitePaymentRepository::fromQuery(const QSqlQuery& query) {
     payment.setId(query.value("id").toLongLong());
     payment.setContactId(query.value("contact_id").toLongLong());
     payment.setAmount(Money(query.value("amount").toLongLong()));
-    payment.setDirection(static_cast<PaymentDirection>(query.value("direction").toInt()));
+    payment.setType(static_cast<PaymentType>(query.value("type").toInt()));
     payment.setDateTime(QDateTime::fromString(query.value("date_time").toString(), Qt::ISODate));
     payment.setComment(query.value("comment").toString());
 

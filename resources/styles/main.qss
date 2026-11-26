@@ -374,9 +374,16 @@ QFrame[item="payment"]:hover {
 QFrame[item="payment"] QLabel {
   background: transparent;
 }
-QFrame[item="payment"] QLabel[role="comment"] {
+
+QFrame[item="payment"] QLabel[role="type"] {
   font-size: 15px;
+  font-weight: 600;
 }
+QFrame[item="payment"] QLabel[role="comment"] {
+  font-size: 13px;
+  color: #44574b;
+}
+
 QFrame[item="payment"] QLabel[role="comment"][muted="true"] {
   color: #a6b5ab;
 }

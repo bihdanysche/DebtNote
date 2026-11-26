@@ -20,24 +20,26 @@ PaymentItem::PaymentItem(const Payment& payment, QWidget* parent)
     auto* textLayout = new QVBoxLayout();
     textLayout->setSpacing(2);
 
-    const bool hasComment = !payment.comment().isEmpty();
-    auto* commentLabel = new QLabel(hasComment ? payment.comment() : "Без коментаря", this);
-    commentLabel->setProperty("role", "comment");
-    commentLabel->setProperty("muted", !hasComment);
-    commentLabel->setWordWrap(true);
+    auto* typeLabel = new QLabel(paymentTypeTitle(payment.type()), this);
+    typeLabel->setProperty("role", "type");
 
     auto* dateLabel = new QLabel(payment.dateTime().toString("dd.MM.yyyy HH:mm"), this);
     dateLabel->setProperty("role", "date");
 
-    textLayout->addWidget(commentLabel);
+    textLayout->addWidget(typeLabel);
+
+    if (!payment.comment().isEmpty()) {
+        auto* commentLabel = new QLabel(payment.comment(), this);
+        commentLabel->setProperty("role", "comment");
+        commentLabel->setWordWrap(true);
+        textLayout->addWidget(commentLabel);
+    }
+
     textLayout->addWidget(dateLabel);
 
     const Money signedAmount = payment.signedAmount();
-    const QString amountText = signedAmount.isPositive()
-        ? "+" + signedAmount.toString()
-        : signedAmount.toString();
-
-    auto* amountLabel = new QLabel(amountText, this);
+    
+    auto* amountLabel = new QLabel(payment.amount().toString(), this);
     amountLabel->setProperty("role", "amount");
     amountLabel->setProperty("balance", signedAmount.isPositive() ? "positive" : "negative");
 
