@@ -1,6 +1,7 @@
+
 cmake_minimum_required(VERSION 3.21)
 
-project(MyApp
+project(DebtNote
     VERSION 1.0
     LANGUAGES CXX
 )
@@ -19,16 +20,31 @@ file(GLOB_RECURSE PROJECT_SOURCES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h"
 )
 
-add_executable(MyApp
+add_executable(DebtNote
     ${PROJECT_SOURCES}
     resources.qrc
 )
 
-target_include_directories(MyApp PRIVATE
+target_include_directories(DebtNote PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-target_link_libraries(MyApp PRIVATE
+target_link_libraries(DebtNote PRIVATE
     Qt6::Widgets
     Qt6::Sql
 )
+
+# Deployment
+include(GNUInstallDirs)
+
+install(TARGETS DebtNote
+    BUNDLE DESTINATION .
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+qt_generate_deploy_app_script(
+    TARGET DebtNote
+    OUTPUT_SCRIPT deploy_script
+)
+
+install(SCRIPT ${deploy_script})
