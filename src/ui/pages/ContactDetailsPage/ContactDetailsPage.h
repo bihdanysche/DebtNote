@@ -1,6 +1,9 @@
 #pragma once
 
 #include "domain/entities/Contact.h"
+#include "ContactBalanceWidget/ContactBalanceWidget.h"
+#include "ContactPaymentsWidget/ContactPaymentsWidget.h"
+
 #include <QWidget>
 
 class MainWindow;
@@ -12,7 +15,6 @@ class QFrame;
 
 class Payment;
 class PaymentService;
-class BalanceService;
 class PaymentFormModal;
 class ConfirmDialog;
 
@@ -32,32 +34,18 @@ private:
     void clearView();
 
     Contact m_contact;
+    qint64 m_contactId = 0;
 
     ContactService* m_contactsService;
+    PaymentService* m_paymentsService;
+
     Toast* m_toast;
     ConfirmDialog* m_dialog;
-    qint64 m_contactId = 0;
 
     QFrame* m_noteContainer;
     QLabel* m_titleLabel;
     QLabel* m_noteLabel;
-    QVBoxLayout* m_paymentsLayout;
 
-    BalanceService* m_balanceService;
-
-    QFrame* m_balanceContainer;
-    QLabel* m_balanceAmount;
-    QLabel* m_balanceDescription;
-
-    void reloadBalance();
-    void resetBalance();
-
-    void reloadPayments();
-    void clearPayments();
-    void onAddPaymentRequested();
-    void onPaymentEditRequested(const Payment& payment);
-    void onPaymentDeleteRequested(const Payment& payment);
-
-    PaymentService* m_paymentsService;
-    PaymentFormModal* m_paymentForm = nullptr;
+    ContactBalanceWidget* m_balanceWidget;
+    ContactPaymentsWidget* m_paymentsWidget;
 };

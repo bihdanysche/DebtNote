@@ -144,14 +144,14 @@ void ContactsPage::showContactItemMenu(const Contact& contact, QWidget* parent, 
     menu.setWindowFlags(menu.windowFlags() | Qt::FramelessWindowHint | Qt::NoDropShadowWindowHint);
 
     QAction* viewAction = nullptr;
-    if (!fromDetailsPage) menu.addAction(QIcon(":/icons/view.svg"), "Переглянути");
+    if (!fromDetailsPage) viewAction = menu.addAction(QIcon(":/icons/view.svg"), "Переглянути");
     QAction* editAction = menu.addAction(QIcon(":/icons/edit.svg"), "Змінити");
     menu.addSeparator();
     QAction* deleteAction = menu.addAction(QIcon(":/icons/delete.svg"), "Видалити");
     
     const QAction* chosen = menu.exec(QCursor::pos() + QPoint(12, 20));
 
-    if (chosen == viewAction) {
+    if (chosen == viewAction && viewAction != nullptr) {
         emit contactSelected(contact.id());
     } else if (chosen == editAction) {
         onEditRequested(contact);
