@@ -30,7 +30,7 @@ void AnimatedStackedWidget::slideTo(int index, bool isForward) {
     animGroup = new QParallelAnimationGroup(this);
 
     QPropertyAnimation* nextAnim = new QPropertyAnimation(next, "pos", animGroup);
-    nextAnim->setStartValue(QPoint(0, isForward ? 60 : -60));
+    nextAnim->setStartValue(QPoint(0, isForward ? 30 : -30));
     nextAnim->setEndValue(QPoint(0, 0));
     nextAnim->setDuration(dur);
     nextAnim->setEasingCurve(QEasingCurve::OutCirc);
