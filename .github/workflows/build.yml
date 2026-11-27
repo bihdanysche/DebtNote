@@ -1,0 +1,144 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  APP_NAME: DebtNote
+  QT_VERSION: "6.8.*"
+  ICON_FILE: resources/icons/app.png
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          host: windows
+          target: desktop
+          arch: win64_msvc2022_64
+          cache: true
+
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Collect portable folder
+        shell: pwsh
+        run: |
+          $dist = "dist/$env:APP_NAME"
+          New-Item -ItemType Directory -Path $dist -Force | Out-Null
+
+          $exe = Get-ChildItem -Path build -Recurse -Filter "$env:APP_NAME.exe" | Select-Object -First 1
+          Copy-Item $exe.FullName $dist
+
+          windeployqt --release --no-translations --no-system-d3d-compiler --no-opengl-sw "$dist/$env:APP_NAME.exe"
+
+          foreach ($dll in 'vcruntime140.dll','vcruntime140_1.dll','msvcp140.dll','msvcp140_1.dll','msvcp140_2.dll') {
+            $path = Join-Path $env:WINDIR "System32\$dll"
+            if (Test-Path $path) { Copy-Item $path $dist }
+          }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}-windows
+          path: dist/${{ env.APP_NAME }}
+
+  build-linux:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install system packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgl1-mesa-dev libxkbcommon-dev libxkbcommon-x11-0 \
+            libxcb-cursor0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-randr0 \
+            libxcb-render-util0 libxcb-shape0 libxcb-xinerama0 libxcb-xkb1 libxcb-util1
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ env.QT_VERSION }}
+          host: linux
+          target: desktop
+          cache: true
+
+      - name: Configure
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Create AppImage
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: 1
+          QMAKE: ${{ env.QT_ROOT_DIR }}/bin/qmake
+          ARCH: x86_64
+        run: |
+          find "$QT_ROOT_DIR/plugins/sqldrivers" -name '*.so' ! -name 'libqsqlite.so' -delete
+
+          cat > "$APP_NAME.desktop" <<EOF
+          [Desktop Entry]
+          Type=Application
+          Name=$APP_NAME
+          Exec=$APP_NAME
+          Icon=$APP_NAME
+          Categories=Office;Finance;
+          Terminal=false
+          EOF
+
+          cp "$ICON_FILE" "$APP_NAME.png"
+
+          wget -q https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          wget -q https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+          wget -q https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
+          chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-qt-x86_64.AppImage appimagetool-x86_64.AppImage
+
+          EXE=$(find build -maxdepth 2 -type f -name "$APP_NAME" -perm -u+x | head -n 1)
+          echo "Found: $EXE"
+
+          ./linuxdeploy-x86_64.AppImage \
+            --appdir AppDir \
+            --executable "$EXE" \
+            --desktop-file "$APP_NAME.desktop" \
+            --icon-file "$APP_NAME.png" \
+            --plugin qt
+
+          ./appimagetool-x86_64.AppImage AppDir "$APP_NAME-linux-x86_64.AppImage"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}-linux
+          path: ${{ env.APP_NAME }}-linux-x86_64.AppImage
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [build-windows, build-linux]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Pack
+        run: |
+          mkdir release
+          (cd "artifacts/$APP_NAME-windows" && zip -r "../../release/$APP_NAME-windows.zip" .)
+          cp "artifacts/$APP_NAME-linux/$APP_NAME-linux-x86_64.AppImage" release/
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
