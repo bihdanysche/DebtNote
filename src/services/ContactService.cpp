@@ -101,6 +101,7 @@ bool ContactService::remove(qint64 id, QString* error) {
 
     m_attachments.removeFiles(attachments);
 
+    emit contactRemoved(id);
     emit contactsChanged();
     return true;
 }
