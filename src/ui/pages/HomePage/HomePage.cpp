@@ -3,6 +3,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 
+#include "services/ContactService.h"
 #include "services/PaymentService.h"
 #include "ui/mainwindow.h"
 #include "BalanceWidget/BalanceWidget.h"
@@ -28,7 +29,11 @@ HomePage::HomePage(MainWindow* mv)
     // Connect to updates
     reload();
     auto *paymentService = mv->services().paymentService;
+    auto *contactService = mv->services().contactService;
     connect(paymentService, &PaymentService::paymentsChanged, this, [this](){
+        reload();
+    });
+    connect(contactService, &ContactService::contactsChanged, this, [this](){
         reload();
     });
     connect(m_activeContactsWidget, &ActiveContactsWidget::showContactRequested, this, &HomePage::viewContactRequested);
