@@ -11,15 +11,18 @@
 #include <QVBoxLayout>
 
 #include "domain/valueobjects/PaymentType.h"
+#include "services/AttachmentService.h"
 #include "services/PaymentService.h"
 #include "ui/common/dialogBase/DialogBase.h"
 #include "ui/common/toasts/toast.h"
 #include "ui/mainwindow.h"
+#include "ui/pages/ContactDetailsPage/PaymentFormModal/AttachmentPicker/AttachmentPicker.h"
 
 PaymentFormModal::PaymentFormModal(MainWindow* mv)
     : DialogBase(mv)
     , m_paymentsService(mv->services().paymentService)
     , m_toast(mv->uiInstances().toast)
+    , m_attachmentsService(mv->services().attachmentService)
 {
     setProperty("modal", "paymentForm");
     innerFrame->setFixedWidth(440);
@@ -68,6 +71,10 @@ PaymentFormModal::PaymentFormModal(MainWindow* mv)
 
     m_commentEdit = new QLineEdit(innerFrame);
     addField("Коментар", m_commentEdit);
+    layout->addSpacing(8);
+
+    m_attachmentPicker = new AttachmentPicker(mv);
+    layout->addWidget(m_attachmentPicker);
     layout->addSpacing(16);
 
     auto* buttonsLayout = new QHBoxLayout();
@@ -116,6 +123,13 @@ void PaymentFormModal::openForEdit(const Payment& payment) {
     m_submitButton->setText("Зберегти");
     fillFields(m_payment);
 
+    QString attachmentsError;
+    const QList<Attachment> attachments = m_attachmentsService->getByPayment(payment.id(), &attachmentsError);
+    if (!attachmentsError.isEmpty()) {
+        m_toast->makeToast(attachmentsError);
+    }
+    m_attachmentPicker->setExisting(attachments);
+
     show();
     m_amountEdit->setFocus();
     m_amountEdit->selectAll();
@@ -129,6 +143,7 @@ void PaymentFormModal::fillFields(const Payment& payment) {
     m_amountEdit->setValue(payment.amount().toHryvnias());
     m_dateTimeEdit->setDateTime(payment.dateTime());
     m_commentEdit->setText(payment.comment());
+    m_attachmentPicker->clear();
 }
 
 void PaymentFormModal::updateHint() {
@@ -155,16 +170,22 @@ void PaymentFormModal::submit() {
     payment.setDateTime(m_dateTimeEdit->dateTime());
     payment.setComment(m_commentEdit->text().trimmed());
 
+    const QStringList newFiles = m_attachmentPicker->newFilePaths();
+
     QString error;
     const bool ok = m_editing
-        ? m_paymentsService->update(payment, &error)
-        : m_paymentsService->add(payment, &error);
+        ? m_paymentsService->update(payment, newFiles, m_attachmentPicker->removedIds(), &error)
+        : m_paymentsService->add(payment, newFiles, &error);
 
     if (!ok) {
         m_toast->makeToast(error);
         return;
     }
 
-    m_toast->makeToast(m_editing ? "Платіж оновлено" : "Платіж створено");
+    if (!error.isEmpty()) {
+        m_toast->makeToast(error);
+    } else {
+        m_toast->makeToast(m_editing ? "Платіж оновлено" : "Платіж створено");
+    }
     hide();
 }

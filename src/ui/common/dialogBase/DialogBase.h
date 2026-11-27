@@ -7,12 +7,14 @@
 #include <qtmetamacros.h>
 #include <qwidget.h>
 
+class MainWindow;
+
 class DialogBase : public QWidget {
     Q_OBJECT
     Q_PROPERTY(qreal overlayOpacity READ overlayOpacity WRITE setOverlayOpacity)
 
 public:
-    explicit DialogBase(QWidget* parent = nullptr);
+    explicit DialogBase(MainWindow* mv);
 
     qreal overlayOpacity() const { return m_opacity; }
     void setOverlayOpacity(qreal opacity);

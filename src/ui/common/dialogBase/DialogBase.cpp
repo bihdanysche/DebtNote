@@ -1,4 +1,5 @@
 #include "DialogBase.h"
+#include "ui/mainwindow.h"
 #include <qboxlayout.h>
 #include <qeasingcurve.h>
 #include <qframe.h>
@@ -10,13 +11,15 @@
 #include <qparallelanimationgroup.h>
 #include <qpropertyanimation.h>
 #include <qpushbutton.h>
+#include <qtimer.h>
 #include <qvariant.h>
 #include <qvariantanimation.h>
+#include <qwindow.h>
 #include <qwindowdefs.h>
 #include <QGraphicsBlurEffect>
 
-DialogBase::DialogBase(QWidget *parent)
-    : QWidget(parent)
+DialogBase::DialogBase(MainWindow *mv)
+    : QWidget(mv)
 {
     overlayLayout = new QVBoxLayout(this);
     overlayLayout->setContentsMargins(0, 0, 0, 0);
@@ -35,6 +38,20 @@ DialogBase::DialogBase(QWidget *parent)
     QWidget::hide();
 
     initAnims();
+
+    QTimer::singleShot(0, [this, mv]{
+        QWindow* window = mv->windowHandle();
+
+        setGeometry(parentWidget()->rect());
+
+        connect(window, &QWindow::widthChanged, this, [this](int width) {
+            setGeometry(parentWidget()->rect());
+        });
+
+        connect(window, &QWindow::heightChanged, this, [this](int height) {
+            setGeometry(parentWidget()->rect());
+        });
+    });
 }
 
 void DialogBase::initAnims() {

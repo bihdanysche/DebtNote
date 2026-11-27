@@ -22,11 +22,13 @@ struct DialogParams {
     QString cancelBtnText = "Ні";
 };
 
+class MainWindow;
+
 class ConfirmDialog : public DialogBase {
     Q_OBJECT
 
 public:
-    explicit ConfirmDialog(QWidget* parent = nullptr);
+    explicit ConfirmDialog(MainWindow* mv);
     void showDialog(const DialogParams& params, std::function<void(int)> callback);
 private:
     QLabel *titleLbl, *descLbl;

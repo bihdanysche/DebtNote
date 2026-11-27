@@ -3,6 +3,7 @@
 #include "services/AttachmentService.h"
 
 #include <QDebug>
+#include <qfileinfo.h>
 
 PaymentService::PaymentService(IPaymentRepository& repo, AttachmentService& attachments, QObject* parent)
     : QObject(parent)
@@ -10,7 +11,7 @@ PaymentService::PaymentService(IPaymentRepository& repo, AttachmentService& atta
     , m_attachments(attachments)
 {}
 
-bool PaymentService::add(const Payment& payment, QString* error) {
+bool PaymentService::add(const Payment& payment, const QStringList& newFiles, QString* error) {
     const QStringList problems = payment.validate();
     if (!problems.isEmpty()) {
         if (error) *error = problems.join("\n");
@@ -27,13 +28,14 @@ bool PaymentService::add(const Payment& payment, QString* error) {
 
     Payment saved = payment;
     saved.setId(*id);
+    syncAttachments(*id, newFiles, {}, error);
 
     emit paymentAdded(saved);
     emit paymentsChanged();
     return true;
 }
 
-bool PaymentService::update(const Payment& payment, QString* error) {
+bool PaymentService::update(const Payment& payment, const QStringList& newFiles, const QList<qint64>& removedIds, QString* error) {
     if (payment.id() <= 0) {
         if (error) *error = "Платіж ще не збережено";
         return false;
@@ -51,6 +53,8 @@ bool PaymentService::update(const Payment& payment, QString* error) {
         if (error) *error = "Помилка бази даних.";
         return false;
     }
+
+    syncAttachments(payment.id(), newFiles, removedIds, error);
 
     emit paymentUpdated(payment);
     emit paymentsChanged();
@@ -127,4 +131,38 @@ QList<Payment> PaymentService::getAll(QString* error) {
     }
 
     return payments;
+}
+
+void PaymentService::syncAttachments(qint64 paymentId, const QStringList& newFiles, const QList<qint64>& removedIds, QString* error) {
+    int failedRemovals = 0;
+    QStringList failedFiles;
+
+    for (qint64 id : removedIds) {
+        const std::optional<Attachment> attachment = m_attachments.getById(id);
+        if (!attachment || attachment->paymentId() != paymentId || !m_attachments.remove(id)) {
+            ++failedRemovals;
+        }
+    }
+
+    for (const QString& path : newFiles) {
+        if (!m_attachments.attach(paymentId, path)) {
+            failedFiles << QFileInfo(path).fileName();
+        }
+    }
+
+    if (failedRemovals == 0 && failedFiles.isEmpty()) {
+        return;
+    }
+
+    QStringList parts;
+    if (failedRemovals > 0) {
+        parts << QString("Не вдалося видалити вкладень: %1").arg(failedRemovals);
+    }
+    if (!failedFiles.isEmpty()) {
+        parts << "Не вдалося додати файли: " + failedFiles.join(", ");
+    }
+
+    if (error) {
+        *error = "Платіж збережено, але " + parts.join("; ");
+    }
 }

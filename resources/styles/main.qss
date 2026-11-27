@@ -562,3 +562,38 @@ QScrollBar::add-page:vertical,
 QScrollBar::sub-page:vertical {
   background: transparent;
 }
+
+/* ATTACHMENTS FOR FORM */
+QFrame[tile="attachment"] {
+  background: #e4f3ea;
+  border: 1px solid #dde7e1;
+  border-radius: 8px;
+}
+QFrame[tile="attachment"] QLabel {
+  background: transparent;
+  color: #206940;
+  font-size: 12px;
+  font-weight: 700;
+}
+QFrame[tile="attachment"] QToolButton {
+  background: rgba(28, 43, 36, 160);
+  color: #ffffff;
+  border: none;
+  border-radius: 9px;
+  font-size: 10px;
+}
+QFrame[tile="attachment"] QToolButton:hover {
+  background: #d64545;
+}
+
+QToolButton[tile="add"] {
+  background: transparent;
+  border: 2px dashed #b7ccbe;
+  border-radius: 8px;
+  color: #2e8b57;
+  font-size: 24px;
+}
+QToolButton[tile="add"]:hover {
+  background: #e4f3ea;
+  border-color: #2e8b57;
+}

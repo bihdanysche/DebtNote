@@ -1,8 +1,9 @@
 #include "ConfirmDialog.h"
 #include "ui/common/dialogBase/DialogBase.h"
+#include "ui/mainwindow.h"
 
-ConfirmDialog::ConfirmDialog(QWidget *parent)
-    : DialogBase(parent)
+ConfirmDialog::ConfirmDialog(MainWindow* mv)
+    : DialogBase(mv)
 {
     innerFrame->setMaximumWidth(600);
     innerFrame->setMinimumWidth(500);

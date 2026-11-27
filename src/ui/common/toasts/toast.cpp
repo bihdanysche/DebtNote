@@ -1,17 +1,20 @@
 #include "toast.h"
+#include "ui/mainwindow.h"
 #include <qboxlayout.h>
 #include <qframe.h>
 #include <qlabel.h>
+#include <qlogging.h>
 #include <qnamespace.h>
 #include <qpropertyanimation.h>
 #include <qpushbutton.h>
 #include <qtimer.h>
-#include <qwindowdefs.h>
+#include <qwidget.h>
 #include <QGraphicsOpacityEffect>
 #include <QPropertyAnimation>
+#include <QWindow>
 
-Toast::Toast(QWidget *parent)
-    : QWidget(parent)
+Toast::Toast(MainWindow *mv)
+    : QWidget(mv)
 {
     QVBoxLayout* centerLayout = new QVBoxLayout(this);
     centerLayout->setContentsMargins(0, 0, 0, 0);
@@ -30,8 +33,20 @@ Toast::Toast(QWidget *parent)
     setAttribute(Qt::WA_StyledBackground);
     setAttribute(Qt::WA_TransparentForMouseEvents);
     setObjectName("toasts_cont");
+    
+    QTimer::singleShot(0, [this, mv]{
+        QWindow* window = mv->windowHandle();
 
-    setGeometry(parentWidget()->rect());
+        setGeometry(parentWidget()->rect());
+
+        connect(window, &QWindow::widthChanged, this, [this](int width) {
+            setGeometry(parentWidget()->rect());
+        });
+
+        connect(window, &QWindow::heightChanged, this, [this](int height) {
+            setGeometry(parentWidget()->rect());
+        });
+    });
 }
 
 void Toast::makeToast(QString text, int durationms) {
@@ -75,3 +90,16 @@ void Toast::makeToast(QString text, int durationms) {
         anim->start(QAbstractAnimation::DeleteWhenStopped);
     });
 }
+
+// bool Toast::eventFilter(QObject* watched, QEvent* event) {
+//     if (event->type() == QEvent::Resize) {
+//         QResizeEvent* resizeEvent = static_cast<QResizeEvent*>(event);
+
+//         int width = resizeEvent->size().width();
+//         int height = resizeEvent->size().height();
+//         qWarning() << "RESIZ!!!";
+//         setGeometry(parentWidget()->rect());
+//     }
+
+//     return QWidget::eventFilter(watched, event);
+// }

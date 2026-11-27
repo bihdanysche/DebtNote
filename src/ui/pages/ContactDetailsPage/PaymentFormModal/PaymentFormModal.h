@@ -12,6 +12,8 @@ class QDoubleSpinBox;
 class QLabel;
 class QLineEdit;
 class QPushButton;
+class AttachmentService;
+class AttachmentPicker;
 
 class PaymentFormModal : public DialogBase {
     Q_OBJECT
@@ -31,6 +33,9 @@ private:
     Toast* m_toast;
     Payment m_payment;
     bool m_editing = false;
+
+    AttachmentService* m_attachmentsService;
+AttachmentPicker* m_attachmentPicker;
 
     QLabel* m_titleLabel;
     QLabel* m_hintLabel;
