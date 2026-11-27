@@ -25,6 +25,10 @@ add_executable(DebtNote
     resources.qrc
 )
 
+set_target_properties(DebtNote PROPERTIES
+    WIN32_EXECUTABLE ON
+)
+
 target_include_directories(DebtNote PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
