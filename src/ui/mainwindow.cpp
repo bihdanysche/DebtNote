@@ -49,7 +49,6 @@ void MainWindow::initSideMenu() {
     }, this);
 
     connect(m_sideMenu, &SideMenu::switchToScreen, this, [this](int id) {
-        // m_stacked->setCurrentIndex(id);
         m_stacked->slideTo(id);
     });
 }
@@ -92,7 +91,6 @@ void MainWindow::initUIInstances() {
 void MainWindow::switchToScreen(Screen screen) {
     int ind = static_cast<int>(screen);
 
-    // m_stacked->setCurrentIndex(ind);
     m_stacked->slideTo(ind);
     m_sideMenu->setSelected(ind);
 }
