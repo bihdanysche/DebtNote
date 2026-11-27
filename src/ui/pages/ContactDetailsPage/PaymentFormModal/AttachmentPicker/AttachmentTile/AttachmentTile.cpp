@@ -8,12 +8,13 @@
 #include <QToolButton>
 #include <qframe.h>
 
-AttachmentTile::AttachmentTile(const QString& path, const QString& fileName, QWidget* parent)
+AttachmentTile::AttachmentTile(const QString& path, const QString& fileName, QWidget* parent, bool removable)
     : QFrame(parent)
 {
     setProperty("tile", "attachment");
     setFixedSize(56, 56);
     setToolTip(fileName);
+    setCursor(Qt::PointingHandCursor);
 
     auto* preview = new QLabel(this);
     preview->setGeometry(1, 1, 54, 54);
@@ -35,14 +36,15 @@ AttachmentTile::AttachmentTile(const QString& path, const QString& fileName, QWi
         preview->setPixmap(QPixmap::fromImage(square.scaled(54, 54, Qt::IgnoreAspectRatio, Qt::SmoothTransformation)));
     }
 
-    auto* removeButton = new QToolButton(this);
-    removeButton->setText("✕");
-    removeButton->setCursor(Qt::PointingHandCursor);
-    removeButton->setFixedSize(18, 18);
-    removeButton->move(width() - 22, 4);
+    if (removable) {
+        auto* removeButton = new QToolButton(this);
+        removeButton->setText("✕");
+        removeButton->setCursor(Qt::PointingHandCursor);
+        removeButton->setFixedSize(18, 18);
+        removeButton->move(width() - 22, 4);
 
-    connect(removeButton, &QToolButton::clicked, this, &AttachmentTile::removeRequested);
-    setCursor(Qt::PointingHandCursor);
+        connect(removeButton, &QToolButton::clicked, this, &AttachmentTile::removeRequested);
+    }
 }
 
 void AttachmentTile::mousePressEvent(QMouseEvent* event) {

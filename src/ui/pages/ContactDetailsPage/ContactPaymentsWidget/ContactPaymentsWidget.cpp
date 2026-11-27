@@ -1,12 +1,15 @@
 #include "ContactPaymentsWidget.h"
+#include "services/AttachmentService.h"
 #include "services/PaymentService.h"
 #include "ui/common/confirmDialog/ConfirmDialog.h"
+#include "ui/common/photoOverlay/PhotoOverlay.h"
 #include "ui/common/toasts/toast.h"
 #include "ui/mainwindow.h"
 #include "ui/pages/ContactDetailsPage/PaymentFormModal/PaymentFormModal.h"
 #include "ui/pages/ContactDetailsPage/PaymentItem/PaymentItem.h"
 #include <qboxlayout.h>
 #include <qlabel.h>
+#include <qlogging.h>
 #include <qpushbutton.h>
 #include <qscrollarea.h>
 
@@ -16,6 +19,8 @@ ContactPaymentsWidget::ContactPaymentsWidget(MainWindow* mv)
     , m_paymentForm(new PaymentFormModal(mv))
     , m_toast(mv->uiInstances().toast)
     , m_paymentsService(mv->services().paymentService)
+    , m_attachmentsService(mv->services().attachmentService)
+    , m_photoOverlay(mv->uiInstances().photoOverlay)
 {
     auto* mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0, 0, 0, 0);
@@ -84,7 +89,13 @@ void ContactPaymentsWidget::reload() {
         m_paymentsLayout->addWidget(emptyLabel);
     } else {
         for (const Payment& payment : payments) {
-            auto* item = new PaymentItem(payment, parent);
+            QString attachmentsError;
+            const QList<Attachment> attachments = m_attachmentsService->getByPayment(payment.id(), &attachmentsError);
+            if (!attachmentsError.isEmpty()) {
+                m_toast->makeToast(attachmentsError);
+            }
+
+            auto* item = new PaymentItem(payment, attachments, parent);
             m_paymentsLayout->addWidget(item);
 
             connect(item, &PaymentItem::requestedEdit, this, [this, payment]() {
@@ -92,6 +103,9 @@ void ContactPaymentsWidget::reload() {
             });
             connect(item, &PaymentItem::requestedDelete, this, [this, payment]() {
                 onDeleteRequested(payment);
+            });
+            connect(item, &PaymentItem::requestedViewAttachment, this, [this](QString path) {
+                m_photoOverlay->setImage(path);
             });
         }
     }

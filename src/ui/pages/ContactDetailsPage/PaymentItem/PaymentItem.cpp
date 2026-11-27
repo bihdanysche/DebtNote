@@ -1,4 +1,5 @@
 #include "PaymentItem.h"
+#include "ui/pages/ContactDetailsPage/PaymentFormModal/AttachmentPicker/AttachmentTile/AttachmentTile.h"
 
 #include <QContextMenuEvent>
 #include <QHBoxLayout>
@@ -7,7 +8,7 @@
 #include <QMenu>
 #include <QVBoxLayout>
 
-PaymentItem::PaymentItem(const Payment& payment, QWidget* parent)
+PaymentItem::PaymentItem(const Payment& payment, const QList<Attachment>& attachments, QWidget* parent)
     : QFrame(parent)
 {
     setProperty("item", "payment");
@@ -25,6 +26,24 @@ PaymentItem::PaymentItem(const Payment& payment, QWidget* parent)
 
     auto* dateLabel = new QLabel(payment.dateTime().toString("dd.MM.yyyy HH:mm"), this);
     dateLabel->setProperty("role", "date");
+
+    if (!attachments.isEmpty()) {
+        auto* tilesLayout = new QHBoxLayout();
+        tilesLayout->setContentsMargins(0, 6, 0, 0);
+        tilesLayout->setSpacing(8);
+
+        for (const Attachment& attachment : attachments) {
+            auto *tile = new AttachmentTile(attachment.storedPath(), attachment.fileName(), this, false);
+            tilesLayout->addWidget(tile);
+            connect(tile, &AttachmentTile::viewRequested, this, [this, attachment]{
+                emit requestedViewAttachment(attachment.storedPath());
+            });
+        }
+        
+        tilesLayout->addStretch();
+
+        textLayout->addLayout(tilesLayout);
+    }
 
     textLayout->addWidget(typeLabel);
 

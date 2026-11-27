@@ -8,6 +8,8 @@ class Toast;
 class ConfirmDialog;
 class PaymentFormModal;
 class PaymentService;
+class AttachmentService;
+class PhotoOverlay;
 
 class Payment;
 
@@ -23,8 +25,9 @@ private:
     
     Toast* m_toast;
     ConfirmDialog* m_dialog;
+    PhotoOverlay* m_photoOverlay;
     PaymentFormModal* m_paymentForm;
-
+    AttachmentService* m_attachmentsService;
     PaymentService* m_paymentsService;
 
     QVBoxLayout* m_paymentsLayout;
