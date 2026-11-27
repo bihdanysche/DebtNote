@@ -9,7 +9,7 @@ SideNavButton::SideNavButton(const SideNavButtonInfo& info, QWidget* parent)
     : QPushButton(parent)
 {
     setObjectName("SideNavButton");
-    setFixedSize(120, 85);
+    setFixedSize(140, 85);
     setCursor(Qt::PointingHandCursor);
     setProperty("selected", false);
 

@@ -71,6 +71,11 @@ QPushButton[variant="danger"]:disabled {
   border-right: 1px solid #dde7e1;
 }
 
+#sidemenuLogo #appName {
+  font-weight: 600;
+  font-size: 14px;
+}
+
 QPushButton#SideNavButton {
   background: transparent;
   border: none;

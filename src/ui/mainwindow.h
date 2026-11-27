@@ -4,7 +4,7 @@
 #include <QMainWindow>
 
 class SideMenu;
-class QStackedWidget;
+class AnimatedStackedWidget;
 
 class HomePage;
 class ContactsPage;
@@ -29,9 +29,11 @@ public:
     explicit MainWindow(AppServices& services, QWidget *parent = nullptr);
     UIInstances uiInstances() { return m_uiInstances; };
     AppServices services() { return m_services; };
+    
+    void switchToScreen(Screen screen);
 private:
     SideMenu *m_sideMenu;
-    QStackedWidget *m_stacked;
+    AnimatedStackedWidget *m_stacked;
     AppServices &m_services;
     UIInstances m_uiInstances;
 
@@ -42,6 +44,4 @@ private:
     void initSideMenu();
     void initStackedWidget();
     void initUIInstances();
-
-    void switchToScreen(Screen screen);
 };

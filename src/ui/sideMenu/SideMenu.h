@@ -24,4 +24,5 @@ signals:
     void switchToScreen(int id);
 private:
     QHash<int, SideNavButton*> m_buttons;
+    QWidget* logoSection();
 };

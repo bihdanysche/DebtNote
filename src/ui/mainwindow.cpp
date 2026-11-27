@@ -14,6 +14,7 @@
 #include <QStackedWidget>
 #include <qlogging.h>
 #include <qstackedwidget.h>
+#include "common/animatedstackedwidget/animatedstackedwidget.h"
 
 MainWindow::MainWindow(AppServices& services, QWidget *parent)
     : m_services(services), QMainWindow(parent)
@@ -48,12 +49,13 @@ void MainWindow::initSideMenu() {
     }, this);
 
     connect(m_sideMenu, &SideMenu::switchToScreen, this, [this](int id) {
-        m_stacked->setCurrentIndex(id);
+        // m_stacked->setCurrentIndex(id);
+        m_stacked->slideTo(id);
     });
 }
 
 void MainWindow::initStackedWidget() {
-    m_stacked = new QStackedWidget(this);
+    m_stacked = new AnimatedStackedWidget(this);
 
     m_homePage = new HomePage(this);
     m_contactsPage = new ContactsPage(this);
@@ -90,6 +92,7 @@ void MainWindow::initUIInstances() {
 void MainWindow::switchToScreen(Screen screen) {
     int ind = static_cast<int>(screen);
 
-    m_stacked->setCurrentIndex(ind);
+    // m_stacked->setCurrentIndex(ind);
+    m_stacked->slideTo(ind);
     m_sideMenu->setSelected(ind);
 }
