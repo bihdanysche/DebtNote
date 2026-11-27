@@ -7,11 +7,13 @@
 #include "domain/entities/Payment.h"
 #include "domain/repositories/IPaymentRepository.h"
 
+class AttachmentService;
+
 class PaymentService : public QObject {
     Q_OBJECT
 
 public:
-    explicit PaymentService(IPaymentRepository& repo, QObject* parent = nullptr);
+    explicit PaymentService(IPaymentRepository& repo, AttachmentService& attachments, QObject* parent = nullptr);
 
     bool add(const Payment& payment, QString* error = nullptr);
     bool update(const Payment& payment, QString* error = nullptr);
@@ -29,4 +31,5 @@ signals:
 
 private:
     IPaymentRepository& m_repo;
+    AttachmentService& m_attachments;
 };

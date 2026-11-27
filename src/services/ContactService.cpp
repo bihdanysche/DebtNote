@@ -1,6 +1,8 @@
 #include "ContactService.h"
+#include "domain/entities/Attachment.h"
 #include "domain/entities/Contact.h"
 #include "domain/repositories/IContactRepository.h"
+#include "services/AttachmentService.h"
 #include "services/ErrorMessages.h"
 #include <optional>
 #include <qcontainerfwd.h>
@@ -10,8 +12,8 @@
 #include <qobject.h>
 #include <qtypes.h>
 
-ContactService::ContactService(IContactRepository& repo, QObject* parent)
-    : m_repo(repo), QObject(parent)
+ContactService::ContactService(IContactRepository& repo, AttachmentService& attachments, QObject* parent)
+    : m_repo(repo), m_attachments(attachments), QObject(parent)
 { }
 
 bool ContactService::add(Contact& contact, QString* error) {
@@ -83,13 +85,21 @@ bool ContactService::update(const Contact& contact, QString* error) {
 }
 
 bool ContactService::remove(qint64 id, QString* error) {
-    QString dbError;
-    
-    if (!m_repo.remove(id, &dbError)) {
-        if (error) *error = kDatabaseError;
-        qWarning() << "ContactService::remove failed: " << dbError;
+    QString attachmentsError;
+    const QList<Attachment> attachments = m_attachments.getByContact(id, &attachmentsError);
+    if (!attachmentsError.isEmpty()) {
+        if (error) *error = attachmentsError;
         return false;
     }
+
+    QString dbError;
+    if (!m_repo.remove(id, &dbError)) {
+        qWarning() << "ContactService::remove failed: " << dbError;
+        if (error) *error = "Помилка бази даних.";
+        return false;
+    }
+
+    m_attachments.removeFiles(attachments);
 
     emit contactsChanged();
     return true;

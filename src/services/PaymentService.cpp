@@ -1,10 +1,13 @@
 #include "PaymentService.h"
+#include "domain/entities/Attachment.h"
+#include "services/AttachmentService.h"
 
 #include <QDebug>
 
-PaymentService::PaymentService(IPaymentRepository& repo, QObject* parent)
+PaymentService::PaymentService(IPaymentRepository& repo, AttachmentService& attachments, QObject* parent)
     : QObject(parent)
     , m_repo(repo)
+    , m_attachments(attachments)
 {}
 
 bool PaymentService::add(const Payment& payment, QString* error) {
@@ -68,11 +71,20 @@ bool PaymentService::remove(qint64 id, QString* error) {
         return false;
     }
 
+    QString attachmentsError;
+    const QList<Attachment> attachments = m_attachments.getByPayment(id, &attachmentsError);
+    if (!attachmentsError.isEmpty()) {
+        if (error) *error = attachmentsError;
+        return false;
+    }
+
     if (!m_repo.remove(id, &dbError)) {
         qWarning() << "PaymentService::remove failed: " << dbError;
         if (error) *error = "Помилка бази даних.";
         return false;
     }
+    
+    m_attachments.removeFiles(attachments);
 
     emit paymentRemoved(id, payment->contactId());
     emit paymentsChanged();

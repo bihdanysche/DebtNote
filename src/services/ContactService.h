@@ -7,11 +7,13 @@
 #include <qobject.h>
 #include <qtmetamacros.h>
 
+class AttachmentService;
+
 class ContactService : public QObject {
     Q_OBJECT;
 
 public:
-    explicit ContactService(IContactRepository& repo, QObject* parent = nullptr);
+    explicit ContactService(IContactRepository& repo, AttachmentService& attachments, QObject* parent = nullptr);
 
     bool add(Contact& contact, QString* error = nullptr);
     bool update(const Contact& contact, QString* error = nullptr);
@@ -24,4 +26,5 @@ signals:
 
 private:
     IContactRepository& m_repo;
+    AttachmentService& m_attachments;
 };

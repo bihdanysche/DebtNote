@@ -3,11 +3,18 @@
 #include "data/database/Database.h"
 #include "services/AppServices.h"
 
+class MainWindow;
+
 class SQLiteContactRepository;
 class ContactService;
+
 class SQLitePaymentRepository;
 class PaymentService;
-class MainWindow;
+
+class SQLiteAttachmentRepository;
+class LocalFileStorage;
+class AttachmentService;
+
 class BalanceService;
 
 class DebtNoteApp : public QApplication {
@@ -31,6 +38,10 @@ private:
 
     std::unique_ptr<SQLitePaymentRepository> m_paymentsRepo;
     std::unique_ptr<PaymentService> m_paymentService;
+
+    std::unique_ptr<LocalFileStorage> m_fileStorage;
+    std::unique_ptr<SQLiteAttachmentRepository> m_attachmentsRepo;
+    std::unique_ptr<AttachmentService> m_attachmentsService;
 
     std::unique_ptr<BalanceService> m_balanceService;
 
