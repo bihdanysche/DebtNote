@@ -16,8 +16,8 @@
 
 ActiveContactsWidget::ActiveContactsWidget(MainWindow* mv)
     : QWidget(mv)
-    , m_balanceService(mv->services().balanceService)
     , m_toast(mv->uiInstances().toast)
+    , m_balanceService(mv->services().balanceService)
 {
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->setContentsMargins(0, 0, 0, 0);
