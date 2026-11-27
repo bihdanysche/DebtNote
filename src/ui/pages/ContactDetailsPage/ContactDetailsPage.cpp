@@ -96,6 +96,14 @@ ContactDetailsPage::ContactDetailsPage(MainWindow* mv)
     connect(moreButton, &QPushButton::pressed, this, [this, moreButton]() {
         emit requestedContactCtxMenu(m_contact, moreButton);
     });
+
+    connect(m_contactsService, &ContactService::contactRemoved, this, [this, mv](qint64 id) {
+        if (m_contactId == id) {
+            m_contactId = -1;
+            clearView();
+            mv->switchToScreen(Screen::Home);
+        }
+    });
 }
 
 void ContactDetailsPage::showContact(qint64 id) {

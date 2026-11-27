@@ -23,6 +23,7 @@ public:
 
 signals:
     void contactsChanged();
+    void contactRemoved(qint64 id);
 
 private:
     IContactRepository& m_repo;
