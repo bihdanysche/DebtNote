@@ -38,7 +38,7 @@ jobs:
         run: cmake --build build --config Release
 
       - name: Install
-        run: cmake --install build --config Release --prefix staging
+        run: cmake --install build --config Release --prefix "${{ github.workspace }}/staging"
 
       - name: Package Linux
         if: runner.os == 'Linux'
