@@ -2,6 +2,7 @@
 #include "domain/entities/Contact.h"
 #include "services/AppServices.h"
 #include "ui/common/confirmDialog/ConfirmDialog.h"
+#include "ui/common/photoOverlay/PhotoOverlay.h"
 #include "ui/common/toasts/toast.h"
 #include "ui/pages/ContactsPage/ContactsPage.h"
 #include "ui/pages/ContactDetailsPage/ContactDetailsPage.h"
@@ -18,7 +19,7 @@ MainWindow::MainWindow(AppServices& services, QWidget *parent)
     : m_services(services), QMainWindow(parent)
 {
     setWindowTitle("DebtNote");
-    resize(800, 550);
+    resize(900, 650);
 
     QWidget* central = new QWidget(this);
     QHBoxLayout* lay = new QHBoxLayout(central);
@@ -83,6 +84,7 @@ void MainWindow::initStackedWidget() {
 void MainWindow::initUIInstances() {
     m_uiInstances.confirmDialog = new ConfirmDialog(this);
     m_uiInstances.toast = new Toast(this);
+    m_uiInstances.photoOverlay = new PhotoOverlay(this);
 }
 
 void MainWindow::switchToScreen(Screen screen) {

@@ -8,6 +8,7 @@
 
 class MainWindow;
 class Toast;
+class PhotoOverlay;
 
 class QHBoxLayout;
 
@@ -37,5 +38,6 @@ private:
     QList<qint64> m_removedIds;
     static constexpr int kMaxFiles = 5;
     Toast* m_toast;
+    PhotoOverlay* m_photoOverlay;
     QHBoxLayout* m_tilesLayout;
 };

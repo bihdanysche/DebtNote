@@ -14,10 +14,12 @@ enum class Screen { Home, Contacts, ContactDetails };
 
 class ConfirmDialog;
 class Toast;
+class PhotoOverlay;
 
 struct UIInstances {
     ConfirmDialog *confirmDialog;
     Toast *toast;
+    PhotoOverlay *photoOverlay;
 };
 
 class MainWindow : public QMainWindow

@@ -7,6 +7,7 @@
 #include <QToolButton>
 #include <QVBoxLayout>
 
+#include "ui/common/photoOverlay/PhotoOverlay.h"
 #include "ui/common/toasts/toast.h"
 #include "ui/mainwindow.h"
 #include "ui/pages/ContactDetailsPage/PaymentFormModal/AttachmentPicker/AttachmentTile/AttachmentTile.h"
@@ -14,6 +15,7 @@
 AttachmentPicker::AttachmentPicker(MainWindow* mv)
     : QWidget()
     , m_toast(mv->uiInstances().toast)
+    , m_photoOverlay(mv->uiInstances().photoOverlay)
 {
     setProperty("picker", "attachments");
 
@@ -140,6 +142,10 @@ void AttachmentPicker::rebuild() {
 
         connect(tile, &AttachmentTile::removeRequested, this, [this, i]() {
             removeEntry(i);
+        });
+
+        connect(tile, &AttachmentTile::viewRequested, this, [this, entry]{
+            m_photoOverlay->setImage(entry.path);
         });
     }
 

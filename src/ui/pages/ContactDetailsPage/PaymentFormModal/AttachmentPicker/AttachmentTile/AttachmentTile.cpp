@@ -6,6 +6,7 @@
 #include <QLabel>
 #include <QPixmap>
 #include <QToolButton>
+#include <qframe.h>
 
 AttachmentTile::AttachmentTile(const QString& path, const QString& fileName, QWidget* parent)
     : QFrame(parent)
@@ -41,4 +42,10 @@ AttachmentTile::AttachmentTile(const QString& path, const QString& fileName, QWi
     removeButton->move(width() - 22, 4);
 
     connect(removeButton, &QToolButton::clicked, this, &AttachmentTile::removeRequested);
+    setCursor(Qt::PointingHandCursor);
+}
+
+void AttachmentTile::mousePressEvent(QMouseEvent* event) {
+    emit viewRequested();
+    QFrame::mousePressEvent(event);
 }
