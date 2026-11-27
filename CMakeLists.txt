@@ -33,18 +33,3 @@ target_link_libraries(DebtNote PRIVATE
     Qt6::Widgets
     Qt6::Sql
 )
-
-# Deployment
-include(GNUInstallDirs)
-
-install(TARGETS DebtNote
-    BUNDLE DESTINATION .
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
-
-qt_generate_deploy_app_script(
-    TARGET DebtNote
-    OUTPUT_SCRIPT deploy_script
-)
-
-install(SCRIPT ${deploy_script})

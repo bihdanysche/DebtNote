@@ -1,26 +1,19 @@
-name: Build and Release
+name: Windows Build and Release
 
 on:
   push:
     tags:
       - "v*"
 
+  workflow_dispatch:
+
 permissions:
   contents: write
 
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - platform: linux-x64
-            os: ubuntu-22.04
-
-          - platform: windows-x64
-            os: windows-2022
-
-    runs-on: ${{ matrix.os }}
+    name: Build Windows x64
+    runs-on: windows-2022
 
     steps:
       - name: Checkout
@@ -30,49 +23,80 @@ jobs:
         uses: jurplel/install-qt-action@v4
         with:
           version: "6.8.3"
+          arch: win64_msvc2022_64
 
       - name: Configure
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+        run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64
 
       - name: Build
         run: cmake --build build --config Release
 
-      - name: Install
-        run: cmake --install build --config Release --prefix "${{ github.workspace }}/staging"
-
-      - name: Package Linux
-        if: runner.os == 'Linux'
-        shell: bash
-        run: |
-          mkdir -p artifacts
-          tar -czf artifacts/DebtNote-linux-x64.tar.gz -C staging .
-
-      - name: Package Windows
-        if: runner.os == 'Windows'
+      - name: Prepare deployment directory
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Force artifacts
-          Compress-Archive -Path staging/* -DestinationPath artifacts/DebtNote-windows-x64.zip
+          New-Item -ItemType Directory -Force staging
 
-      - name: Upload artifacts
+          Copy-Item build/Release/DebtNote.exe staging/
+
+      - name: Deploy Qt and compiler dependencies
+        shell: pwsh
+        run: |
+          windeployqt `
+            --release `
+            --compiler-runtime `
+            --sql `
+            --dir staging `
+            staging/DebtNote.exe
+
+      - name: Verify deployment
+        shell: pwsh
+        run: |
+          $requiredFiles = @(
+            "staging/DebtNote.exe",
+            "staging/Qt6Core.dll",
+            "staging/Qt6Widgets.dll",
+            "staging/platforms/qwindows.dll",
+            "staging/sqldrivers/qsqlite.dll",
+            "staging/vcruntime140.dll",
+            "staging/vcruntime140_1.dll"
+          )
+
+          foreach ($file in $requiredFiles) {
+            if (!(Test-Path $file)) {
+              throw "Missing deployment file: $file"
+            }
+          }
+
+          Write-Host "Deployment verification passed."
+
+      - name: Package
+        shell: pwsh
+        run: |
+          Compress-Archive `
+            -Path staging/* `
+            -DestinationPath DebtNote-windows-x64.zip
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.platform }}
-          path: artifacts/*
+          name: DebtNote-windows-x64
+          path: DebtNote-windows-x64.zip
 
   release:
+    name: Publish Release
     needs: build
     runs-on: ubuntu-22.04
 
+    if: startsWith(github.ref, 'refs/tags/')
+
     steps:
-      - name: Download artifacts
+      - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          path: release-files
-          merge-multiple: true
+          name: DebtNote-windows-x64
 
-      - name: Publish Release
+      - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: release-files/*
+          files: DebtNote-windows-x64.zip
           generate_release_notes: true
