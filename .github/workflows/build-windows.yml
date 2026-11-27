@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 env:
-  APP_NAME: MyApp
+  APP_NAME: DebtNote
 
 jobs:
   build-windows:
